@@ -2,18 +2,11 @@ pipeline {
     agent any
     stages {
         stage('Build') {
-            steps {
-                mvn -B -DskipTests clean package
-            }
+            mvn -B -DskipTests clean package
         }
-        stage('Test') { 
-            steps {
-                mvn test
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml' 
-                }
-            }
+        stage('Test') {
+            mvn test
+            junit 'target/surefire-reports/*.xml'
         }
         stage('Publish to Jira') {
             def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
