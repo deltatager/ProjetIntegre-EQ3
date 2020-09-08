@@ -19,7 +19,7 @@ pipeline {
         stage('Publish to Jira') {
             steps{
                 script {
-                        comment = [ body: 'test comment' ]
+                    comment = [ body: 'test comment' ]
                     jiraAddComment idOrKey: getCommit(), input: comment
                 }
             }
