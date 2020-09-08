@@ -11,7 +11,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh 'mvn test'
                     script {
-                        ${currentBuild.currentResult} = 'FAILURE'
+                        currentBuild.result = 'FAILURE'
                     }
                 }
             }
@@ -25,7 +25,7 @@ pipeline {
             steps{
                 script {
                     def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
-                    def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.currentResult}" ]
+                    def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.result}" ]
                     jiraAddComment idOrKey: getCommit(commit), input: comment, auditLog: false
                 }
             }
