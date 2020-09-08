@@ -10,6 +10,9 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh 'mvn test'
+                    script {
+                        ${currentBuild.currentResult} = 'FAILURE'
+                    }
                 }
             }
             post {
