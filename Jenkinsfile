@@ -13,6 +13,12 @@ pipeline {
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
+                    jacoco(
+                          execPattern: 'target/*.exec',
+                          classPattern: 'target/classes',
+                          sourcePattern: 'src/main/java',
+                          exclusionPattern: 'src/test*'
+                    )
                     script {
                         def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
                         def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.currentResult}" ]
