@@ -10,14 +10,16 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh 'mvn test'
-                    script {
-                        currentBuild.result = 'FAILURE'
-                    }
                 }
             }
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
+                }
+                failure {
+                    script {
+                        currentBuild.result = 'FAILURE'
+                    }
                 }
             }
         }
