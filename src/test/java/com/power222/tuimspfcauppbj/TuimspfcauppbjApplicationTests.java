@@ -11,7 +11,6 @@ class TuimspfcauppbjApplicationTests {
 	@Test
 	void contextLoads() {
 		System.out.println("Hello World!");
-		fail();
 	}
 
 }
