@@ -26,6 +26,6 @@ pipeline {
 
 @NonCPS
 def getCommit(commit) {
-    def matcher = (commit =~ '([a-zA-Z][a-zA-Z0-9_]+-[1-9][0-9]*)')
+    def matcher = (commit =~ '(Eq3+-[1-9][0-9]*)')
     return matcher[0][1]
 }
