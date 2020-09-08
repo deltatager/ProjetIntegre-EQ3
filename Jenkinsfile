@@ -8,32 +8,16 @@ pipeline {
         }
         stage('Test') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'mvn test'
-                }
+                sh 'mvn test'
             }
             post {
                 always {
                     junit 'target/surefire-reports/*.xml'
-                }
-                unsuccessful {
                     script {
-                        currentBuild.result = 'FAILURE'
+                        def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+                        def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.currentResult}" ]
+                        jiraAddComment idOrKey: getCommit(commit), input: comment, auditLog: false
                     }
-                }
-                success {
-                    script {
-                        currentBuild.result = 'SUCCESS'
-                    }
-                }
-            }
-        }
-        stage('Publish to Jira') {
-            steps{
-                script {
-                    def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
-                    def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.result}" ]
-                    jiraAddComment idOrKey: getCommit(commit), input: comment, auditLog: false
                 }
             }
         }
