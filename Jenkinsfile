@@ -17,7 +17,7 @@ pipeline {
                           execPattern: 'target/*.exec',
                           classPattern: 'target/classes',
                           sourcePattern: 'src/main/java',
-                          exclusionPattern: 'src/test*'
+                          exclusionPattern: 'src/test*,com/power222/tuimspfcauppbj/TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPoweredByJavaApplication.class'
                     )
                     script {
                         def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
