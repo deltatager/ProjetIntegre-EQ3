@@ -10,7 +10,7 @@ class TuimspfcauppbjApplicationTests {
 
 	@Test
 	void contextLoads() {
-		System.out.println("Hello World! New branch");
+		System.out.println("Hello World! New branch 2");
 	}
 
 }
