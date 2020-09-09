@@ -1,4 +1,4 @@
-package com.power222.tuimspfcauppbj.configuration;
+package com.power222.tuimspfcauppbj.config;
 
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @EnableWebSecurity
-public class TestSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -21,7 +21,7 @@ public class TestSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/hello/private")
                 .hasRole("USER")
-                .antMatchers("/hello")
+                .anyRequest()
                 .permitAll()
                 .and()
                 .httpBasic();
