@@ -16,7 +16,7 @@ pipeline {
                     jacoco(
                           execPattern: 'target/*.exec',
                           classPattern: 'target/classes',
-                          sourcePattern: 'src/main/java, com.power222.controller, com.power222.service, com.power222.util',
+                          sourcePattern: 'com.power222.controller, com.power222.service, com.power222.util',
                           exclusionPattern: 'src/test*'
                     )
                     script {
