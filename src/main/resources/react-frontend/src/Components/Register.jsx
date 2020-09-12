@@ -1,5 +1,6 @@
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import React, {Component} from 'react';
+import * as yup from 'yup';
 
 class Register extends Component {
     constructor(props) {
@@ -16,63 +17,26 @@ class Register extends Component {
     }
 
     componentDidMount = () => {
-
+        
     }
 
-    onSubmit = (values) => {
-
+    onSubmit = (validationSchema) => {
+            console.log("aaaa" + validationSchema.isValid());
     }
 
-
-    validate = (values) => {
-        let errors = {}
-        if (!values.firstName) {
-            errors.firstName = "Enter a firstname"
-        } else if (values.firstName.length < 2) {
-            errors.firstName = `The firstname ${values.firstName} is too short should be between 2 and 30 letters `
-        } else if (values.firstName.length > 30) {
-            errors.firstName = ` The firstname ${values.firstName} is too long should be between 2 and 30 letters `
-        }
-
-        if (!values.lastName) {
-            errors.lastName = "Enter a lastname"
-        } else if (values.lastName.length < 2) {
-            errors.lastName = `The lastname ${values.lastName} is too short should be between 2 and 30 letters `
-        } else if (values.lastName.length > 30) {
-            errors.lastName = `The lastname ${values.lastName} is too long should be between 2 and 30 letters `
-        }
-
-
-        if (!values.username) {
-            errors.username = "Enter a username"
-        } else if (values.username.length < 2) {
-            errors.username = `The username ${values.username} is too short should be between 2 and 30 letters `
-        } else if (values.username.length > 30) {
-            errors.username = `The username ${values.username} is too long should be between 2 and 30 letters `
-        }
-
-        if (!values.email) {
-            errors.email = "Enter an email"
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-
-            errors.email = ` ${values.email} is an  invalid email address`;
-
-        }
-
-        if (!values.password) {
-            errors.password = "Enter a password"
-        } else if (values.password.length < 8) {
-            errors.password =
-                "Password should have at least 8 characters"
-        } else if (values.password != values.passwordConfirm) {
-            errors.passwordConfirm = "The password confirmation is not matching the password you entered"
-        }
-
-
-        return errors
-    }
-
-
+    /**(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email))  */
+    validationSchema =  yup.object()
+    .shape({   
+        firstName : yup.string().trim().min(2,"The first name is too Short should have at least 2 characters").required(),
+        lastName : yup.string().trim().min(2).max(30).required(),
+        username: yup.string().trim().min(2).max(30).required(),
+    email: yup.string().trim().email().required(),
+    password: yup.string().trim().min(8).required(),
+    passwordConfirm: yup.string()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
+}
+    )
+    
     errorBlocks = () => {
         return <div>
             <ErrorMessage name="firstName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
@@ -127,8 +91,9 @@ class Register extends Component {
     }
 
 
-    render() {
+    
 
+    render() {
         const initialValuesJson = {
             firstName: "",
             lastName: "",
@@ -143,11 +108,12 @@ class Register extends Component {
             <div>
                 <div className="container">
                     <Formik
-                        onSubmit={this.onSubmit}
-                        validate={this.validate}
+                        onSubmit={() => this.onSubmit(this.validationSchema)}
+
                         validateOnBlur={false}
                         validateOnChange={false}
                         enableReinitialize={true}
+                        validationSchema={this.validationSchema}
                         initialValues={initialValuesJson}
                     >
 
@@ -161,7 +127,7 @@ class Register extends Component {
                                     {this.errorBlocks()}
                                     {this.formFields(props)}
 
-                                    <button onSubmit={this.onSubmit} className="btn btn-success" type="submit">Register
+                                    <button  className="btn btn-success" type="submit">Register
                                         Student
                                     </button>
                                 </Form>
