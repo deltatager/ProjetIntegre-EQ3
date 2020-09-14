@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 @Entity
 public class Student extends User {
 
-    private Long studentId;
     private String firstName;
     private String lastName;
     private String permanentCode;

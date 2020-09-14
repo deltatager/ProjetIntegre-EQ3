@@ -38,7 +38,6 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-
     @Override
     public boolean isAccountNonLocked() {
         return true;
