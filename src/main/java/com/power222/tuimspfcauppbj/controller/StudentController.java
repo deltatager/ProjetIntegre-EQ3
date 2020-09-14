@@ -19,16 +19,15 @@ public class StudentController {
 
 
     @Autowired
-
     private StudentRepository repository;
 
-    @GetMapping("allStudents")
+    @GetMapping("getAllStudents")
     public List<Student> getAllStudents(){
         return  repository.findAll();
     }
 
 
-    @PostMapping("create")
+    @PostMapping("createStudent")
     public Student createOrSaveStudent(@RequestBody Student newStudent){
         return  repository.save(newStudent);
     }
@@ -42,6 +41,11 @@ public class StudentController {
     public Student updateStudent(@RequestBody Student newStudent, @PathVariable Long id){
         return repository.findById(id).map(student -> {
             student.setFirstName(newStudent.getFirstName());
+            student.setLastName(newStudent.getLastName());
+            student.setEmail(newStudent.getEmail());
+            student.setPermanentCode(newStudent.getPermanentCode());
+            student.setPhoneNumber(newStudent.getPhoneNumber());
+            student.setRegistrationNumber(newStudent.getRegistrationNumber());
             return repository.save(student);
         }).orElseGet(() -> {
             newStudent.setId(id);
