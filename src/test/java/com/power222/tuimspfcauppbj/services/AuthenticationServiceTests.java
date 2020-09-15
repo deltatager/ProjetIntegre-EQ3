@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+
 public class AuthenticationServiceTests {
 
     @Mock
@@ -26,11 +27,9 @@ public class AuthenticationServiceTests {
     @MockBean
     private AuthenticationService authSvc;
 
-    //@Test
-    //@WithMockUser(value = "admin", password = "password", )
+    @Test
+    @WithMockUser("fk_etudiant")
     void invalidUser() {
-        when(userRepo.findByUsername(any())).thenReturn(Optional.empty());
-
         assertThat(authSvc.getCurrentUser(), is(equalTo(new User())));
     }
 }

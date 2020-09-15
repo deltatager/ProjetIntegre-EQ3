@@ -9,8 +9,9 @@ import javax.persistence.Entity;
 public class Employer extends User{
 
     private String companyName;
-    private String FirstName;
-    private String lastName;
+    private String contactName;
     private String phoneNumber;
+    private String address;
+    private String email;
 
 }

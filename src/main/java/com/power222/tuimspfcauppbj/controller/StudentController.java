@@ -4,57 +4,52 @@ package com.power222.tuimspfcauppbj.controller;
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
+@RequestMapping("/students")
 public class StudentController {
-
-    @GetMapping("/hello1")
-    public String hello1() {
-        return "Hello, world!";
-  }
-
 
     @Autowired
     private StudentRepository repository;
 
-    @GetMapping("getAllStudents")
+    @GetMapping//()?
     public List<Student> getAllStudents(){
         return  repository.findAll();
     }
 
 
-    @PostMapping("createStudent")
-    public Student createOrSaveStudent(@RequestBody Student newStudent){
-        return  repository.save(newStudent);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED) //? ResponseEntity
+    public Student createStudent(@RequestBody Student newStudent){
+        return  repository.saveAndFlush(newStudent);
     }
 
-    @GetMapping("getStudents/{id}")
-    public Student getStudentById(@PathVariable Long id){
+    @GetMapping("/{id}")
+    public Student getStudentById(@PathVariable long id){
         return repository.findById(id).get();
     }
 
-    @PutMapping("putStudents/{id}")
-    public Student updateStudent(@RequestBody Student newStudent, @PathVariable Long id){
-        return repository.findById(id).map(student -> {
-            student.setFirstName(newStudent.getFirstName());
-            student.setLastName(newStudent.getLastName());
-            student.setEmail(newStudent.getEmail());
-            student.setPermanentCode(newStudent.getPermanentCode());
-            student.setPhoneNumber(newStudent.getPhoneNumber());
-            student.setRegistrationNumber(newStudent.getRegistrationNumber());
-            return repository.save(student);
-        }).orElseGet(() -> {
-            newStudent.setId(id);
-            return repository.save(newStudent);
+    @PutMapping("/{id}")//HttpStatus.CREATED?
+    public ResponseEntity<Student> updateStudent(@RequestBody Student newStudent, @PathVariable long id){
+        Optional<Student> optStudent = repository.findById(id).map(oldStudent -> {
+            newStudent.setId(oldStudent.getId());
+            return repository.saveAndFlush(newStudent);
         });
+        return ResponseEntity.of(optStudent);
     }
 
-    @DeleteMapping("deleteStudents/{id}")
-    public void deleteStudent(@PathVariable Long id){
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public void deleteStudent(@PathVariable long id){
         repository.deleteById(id);
     }
 

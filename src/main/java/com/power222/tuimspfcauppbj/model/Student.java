@@ -10,9 +10,9 @@ public class Student extends User {
 
     private String firstName;
     private String lastName;
-    private String permanentCode;
-    private String registrationNumber;
+    private String studentId;
     private String email;
     private String phoneNumber;
+    private String address;
 
 }
