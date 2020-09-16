@@ -2,7 +2,7 @@ import {ErrorMessage, Field, Form, Formik} from 'formik';
 import React, {Component} from 'react';
 import * as yup from 'yup';
 
-class Register extends Component {
+class RegisterStudent extends Component {
     constructor(props) {
         super(props);
 
@@ -140,4 +140,4 @@ class Register extends Component {
     }
 }
 
-export default Register;
+export default RegisterStudent;
