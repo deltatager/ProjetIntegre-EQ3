@@ -20,24 +20,24 @@ public class StudentController {
     @Autowired
     private StudentRepository repository;
 
-    @GetMapping//()?
+    @GetMapping//()? // fonction
     public List<Student> getAllStudents(){
         return  repository.findAll();
     }
 
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) //? ResponseEntity
+    @ResponseStatus(HttpStatus.CREATED) //? ResponseEntity // fonction
     public Student createStudent(@RequestBody Student newStudent){
         return  repository.saveAndFlush(newStudent);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") // fonction
     public Student getStudentById(@PathVariable long id){
         return repository.findById(id).get();
     }
 
-    @PutMapping("/{id}")//HttpStatus.CREATED?
+    @PutMapping("/{id}")//HttpStatus.CREATED? // fonction
     public ResponseEntity<Student> updateStudent(@RequestBody Student newStudent, @PathVariable long id){
         Optional<Student> optStudent = repository.findById(id).map(oldStudent -> {
             newStudent.setId(oldStudent.getId());
@@ -47,7 +47,7 @@ public class StudentController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")// fonction
     @Transactional
     public void deleteStudent(@PathVariable long id){
         repository.deleteById(id);
