@@ -1,6 +1,8 @@
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import React, {Component} from 'react';
 import * as yup from 'yup';
+import axios from 'axios'
+import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
 
 class Register extends Component {
     constructor(props) {
@@ -17,11 +19,19 @@ class Register extends Component {
     }
 
     componentDidMount = () => {
-        
+ 
     }
 
+
+
     onSubmit = (validationSchema) => {
-            console.log("aaaa" + validationSchema.isValid());
+        axios.post(`localhost:8080/register`,JSON.stringify(this.state))
+        .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
     }
 
     /**(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email))  */
