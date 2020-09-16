@@ -5,6 +5,7 @@ import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,24 +21,24 @@ public class StudentController {
     @Autowired
     private StudentRepository repository;
 
-    @GetMapping//()? // fonction
+    @GetMapping
     public List<Student> getAllStudents(){
         return  repository.findAll();
     }
 
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) //? ResponseEntity // fonction
+    @ResponseStatus(HttpStatus.CREATED)
     public Student createStudent(@RequestBody Student newStudent){
         return  repository.saveAndFlush(newStudent);
     }
 
-    @GetMapping("/{id}") // fonction
+    @GetMapping("/{id}")
     public Student getStudentById(@PathVariable long id){
         return repository.findById(id).get();
     }
 
-    @PutMapping("/{id}")//HttpStatus.CREATED? // fonction
+    @PutMapping("/{id}")
     public ResponseEntity<Student> updateStudent(@RequestBody Student newStudent, @PathVariable long id){
         Optional<Student> optStudent = repository.findById(id).map(oldStudent -> {
             newStudent.setId(oldStudent.getId());
@@ -47,7 +48,7 @@ public class StudentController {
     }
 
 
-    @DeleteMapping("/{id}")// fonction
+    @DeleteMapping("/{id}")
     @Transactional
     public void deleteStudent(@PathVariable long id){
         repository.deleteById(id);
