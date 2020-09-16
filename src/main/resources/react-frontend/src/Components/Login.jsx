@@ -20,7 +20,6 @@ class Login extends Component {
             username : values.username,
             password : values.password
         })
-            console.log(this.state.username);
     }
 
 
