@@ -13,6 +13,8 @@ class Register extends Component {
             firstName: "",
             lastName: "",
             email: "",
+            phoneNumber : "",
+            address : "",
             username: "",
             password: "",
             passwordConfirm: "",
@@ -28,14 +30,28 @@ class Register extends Component {
             firstName : values.firstName,
             lastName : values.lastName,
             email: values.email,
+            phoneNumber : values.phoneNumber,
+            address : values.address,
             username: values.username,
             password: values.password,
             passwordConfirm: values.passwordConfirm
         })
 
-            axios.post(`http://localhost:8080/students`,JSON.stringify({
-              
-            }))
+            const bodyRequest = {
+               firstName : this.state.firstName,
+               lastName : this.state.lastName,
+              email : this.state.email,
+              phoneNumber : this.state.phoneNumber,
+              enabled : true,
+              role : "student",
+              address : this.state.address,
+              username : this.state.username,
+              password : this.state.password
+            }
+
+
+            console.log(this.state)
+            axios.post(`http://localhost:8080/students`,bodyRequest)
                 .then(function (response) {
                     console.log(response);
                 })
@@ -54,6 +70,8 @@ class Register extends Component {
                 lastName : yup.string().trim().min(2).max(30).required(),
                 username: yup.string().trim().min(2).max(30).required(),
                 email: yup.string().trim().email().required(),
+                phoneNumber : yup.string().trim().required(),
+                address : yup.string().trim().required(),
                 password: yup.string().trim().min(8).required(),
                 passwordConfirm: yup.string()
                     .oneOf([yup.ref('password'), null], 'Passwords must match')
@@ -66,6 +84,8 @@ class Register extends Component {
             <ErrorMessage name="lastName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="username" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="email" component="div" className="alert alert-warning" style={{color: 'red'}}/>
+            <ErrorMessage name="phoneNumber" component="div" className="alert alert-warning" style={{color: 'red'}}/>
+            <ErrorMessage name="address" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="password" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="passwordConfirm" component="div" className="alert alert-warning"
                           style={{color: 'red'}}/>
@@ -100,6 +120,18 @@ class Register extends Component {
             </fieldset>
 
             <fieldset className="form-group">
+                <label>Phone Number : </label>
+                <Field style={props.errors.tel ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
+                       className="form-control" type="phone" name="phoneNumber"/>
+            </fieldset>
+
+            <fieldset className="form-group">
+                <label>Address : </label>
+                <Field style={props.errors.address ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
+                       className="form-control" type="text" name="address"/>
+            </fieldset>
+
+            <fieldset className="form-group">
                 <label>Password : </label>
                 <Field style={props.errors.password ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
                        className="form-control" type="password" name="password"/>
@@ -123,7 +155,11 @@ class Register extends Component {
             email: "",
             username: "",
             password: "",
-            passwordConfirm: ""
+            passwordConfirm: "",
+           phoneNumber : "",
+           enabled : true,
+           role : "",
+           address : "",
         }
 
 
