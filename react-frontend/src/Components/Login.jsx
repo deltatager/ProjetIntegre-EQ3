@@ -27,10 +27,10 @@ class Login extends Component {
 
         axios({
             method: "GET",
-            url: "/auth/basic",
+            url: "http://localhost:8080/auth/basic",
             headers: {
                 authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
-            },
+            }
         }).then(function (response) {
             console.log(response);
         }).catch(function (error) {
