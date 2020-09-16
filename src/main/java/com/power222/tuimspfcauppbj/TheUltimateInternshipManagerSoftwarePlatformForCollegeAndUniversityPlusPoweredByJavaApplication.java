@@ -58,9 +58,9 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
                     .password(passwordEncoder.encode("password"))
                     .build());
 
-            Student student1 = new Student();
-            student1.setFirstName("Bob");
-            repository.save(student1);
+            //Student student1 = new Student();
+            //student1.setFirstName("Bob");
+            //repository.save(student1);
         }
     }
 
