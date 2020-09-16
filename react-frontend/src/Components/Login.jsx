@@ -1,6 +1,7 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-
 import React,{Component} from 'react';
+const axios = require("axios");
+
 class Login extends Component {
     constructor(props) {
         super(props);
@@ -19,8 +20,22 @@ class Login extends Component {
         this.setState({
             username : values.username,
             password : values.password
-        })
-            console.log(this.state.username);
+        });
+        
+        console.log(this.state.username + ":" + this.state.password);
+        console.log(window.btoa(this.state.username + ":" + this.state.password));
+
+        axios({
+            method: "GET",
+            url: "/auth/basic",
+            headers: {
+                authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
+            },
+        }).then(function (response) {
+            console.log(response);
+        }).catch(function (error) {
+            console.log(error);
+        });
     }
 
 
