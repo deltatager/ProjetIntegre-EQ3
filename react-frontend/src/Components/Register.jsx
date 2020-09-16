@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import * as yup from 'yup';
 import axios from 'axios'
 import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
+const shortid = require('shortid');
 
 
 class Register extends Component {
@@ -43,6 +44,7 @@ class Register extends Component {
                lastName : this.state.lastName,
               email : this.state.email,
               phoneNumber : this.state.phoneNumber,
+              studentId : shortid.generate(),
               enabled : true,
               role : "student",
               address : this.state.address,
