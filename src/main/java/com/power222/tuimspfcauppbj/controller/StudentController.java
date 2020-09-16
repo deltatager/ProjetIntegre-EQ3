@@ -30,7 +30,21 @@ public class StudentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Student createStudent(@RequestBody Student newStudent){
-        return  repository.saveAndFlush(newStudent);
+        boolean vrai = false;
+        List<Student> listStudent = repository.findAll();
+        for (int i = 0; listStudent.size() > i ; i++){
+            if(listStudent.get(i).getUsername().equals(newStudent.getUsername())){
+                vrai = true;
+                break;
+            }
+        }
+        if(vrai){
+            HttpStatus.valueOf(409);
+        }else{
+            HttpStatus.valueOf(201);
+            return  repository.saveAndFlush(newStudent);
+        }
+        return null;
     }
 
     @GetMapping("/{id}")
