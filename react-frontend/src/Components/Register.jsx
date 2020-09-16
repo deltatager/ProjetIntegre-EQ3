@@ -1,6 +1,8 @@
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import React, {Component} from 'react';
 import * as yup from 'yup';
+import axios from 'axios'
+import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
 
 class Register extends Component {
     constructor(props) {
@@ -17,26 +19,44 @@ class Register extends Component {
     }
 
     componentDidMount = () => {
-        
+
     }
 
-    onSubmit = (validationSchema) => {
-            console.log("aaaa" + validationSchema.isValid());
+
+
+    onSubmit = (values) => {
+
+        this.setState({
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            username: values.username,
+            password: values.password,
+            passwordConfirm: values.passwordConfirm,
+        })
+
+        axios.post(`http://localhost:8080/students`,JSON.stringify(this.state))
+            .then(function (response) {
+                console.log(response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 
     /**(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email))  */
     validationSchema =  yup.object()
-    .shape({   
-        firstName : yup.string().trim().min(2,"The first name is too Short should have at least 2 characters").required(),
-        lastName : yup.string().trim().min(2).max(30).required(),
-        username: yup.string().trim().min(2).max(30).required(),
-    email: yup.string().trim().email().required(),
-    password: yup.string().trim().min(8).required(),
-    passwordConfirm: yup.string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-}
-    )
-    
+        .shape({
+                firstName : yup.string().trim().min(2,"The first name is too Short should have at least 2 characters").required(),
+                lastName : yup.string().trim().min(2).max(30).required(),
+                username: yup.string().trim().min(2).max(30).required(),
+                email: yup.string().trim().email().required(),
+                password: yup.string().trim().min(8).required(),
+                passwordConfirm: yup.string()
+                    .oneOf([yup.ref('password'), null], 'Passwords must match')
+            }
+        )
+
     errorBlocks = () => {
         return <div>
             <ErrorMessage name="firstName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
@@ -91,7 +111,7 @@ class Register extends Component {
     }
 
 
-    
+
 
     render() {
         const initialValuesJson = {

@@ -1,7 +1,6 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import React,{Component} from 'react';
-const axios = require("axios").default;
 
+import React,{Component} from 'react';
 class Login extends Component {
     constructor(props) {
         super(props);
@@ -17,20 +16,11 @@ class Login extends Component {
     }
 
     onSubmit = (values) => {
-        console.log(this.state.username + ":" + this.state.password);
-        console.log(window.btoa(this.state.username + ":" + this.state.password));
-
-        axios({
-            method: "GET",
-            url: "/auth/basic",
-            headers: {
-                authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
-            },
-        }).then(function (response) {
-            console.log(response);
-        }).catch(function (error) {
-            console.log(error);
-        });
+        this.setState({
+            username : values.username,
+            password : values.password
+        })
+            console.log(this.state.username);
     }
 
 
@@ -53,13 +43,13 @@ class Login extends Component {
             <fieldset className="form-group">
                 <label>Username : </label>
                 <Field style={props.errors.username ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
-                       className="form-control" type="text" name="username"/>
+                       className="form-control" type="text" name="username" id="username"/>
             </fieldset>
 
             <fieldset className="form-group">
                 <label>Password : </label>
                 <Field style={props.errors.password ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
-                       className="form-control" type="password" name="password"/>
+                       className="form-control" type="password" name="password" id="password"/>
             </fieldset>
 
         </div>
