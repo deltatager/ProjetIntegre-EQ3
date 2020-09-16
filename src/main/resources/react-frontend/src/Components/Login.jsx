@@ -1,4 +1,5 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
+
 import React,{Component} from 'react';
 class Login extends Component {
     constructor(props) {
@@ -15,7 +16,11 @@ class Login extends Component {
     }
 
     onSubmit = (values) => {
-
+        this.setState({
+            username : values.username,
+            password : values.password
+        })
+            console.log(this.state.username);
     }
 
 
@@ -38,13 +43,13 @@ class Login extends Component {
             <fieldset className="form-group">
                 <label>Username : </label>
                 <Field style={props.errors.username ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
-                       className="form-control" type="text" name="username"/>
+                       className="form-control" type="text" name="username" id="username"/>
             </fieldset>
 
             <fieldset className="form-group">
                 <label>Password : </label>
                 <Field style={props.errors.password ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
-                       className="form-control" type="password" name="password"/>
+                       className="form-control" type="password" name="password" id="password"/>
             </fieldset>
 
         </div>
@@ -55,7 +60,7 @@ class Login extends Component {
 
         const initialValuesJson = {
             username: "",
-            password: "",
+            password: ""
         }
 
 

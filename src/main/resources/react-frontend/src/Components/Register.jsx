@@ -24,8 +24,18 @@ class Register extends Component {
 
 
 
-    onSubmit = (validationSchema) => {
-        axios.post(`localhost:8080/register`,JSON.stringify(this.state))
+    onSubmit = (values) => {
+        
+        this.setState({
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            username: values.username,
+            password: values.password,
+            passwordConfirm: values.passwordConfirm,
+        })
+
+        axios.post(`/students`,JSON.stringify(this.state))
         .then(function (response) {
             console.log(response);
           })
