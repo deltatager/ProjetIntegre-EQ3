@@ -5,7 +5,7 @@ class Footer extends Component {
     render() {
         return (
             <div className="myFooter">
-                <i class="fa fa-copyright">{new Date().getFullYear()} Cégep André-Laurendeau</i>
+                <i className="fa fa-copyright">{new Date().getFullYear()} Cégep André-Laurendeau</i>
             </div>
         )
     }

@@ -4,6 +4,7 @@ import * as yup from 'yup';
 import axios from 'axios'
 import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
 
+
 class Register extends Component {
     constructor(props) {
         super(props);
@@ -22,28 +23,30 @@ class Register extends Component {
 
     }
 
-
-
     onSubmit = (values) => {
-
         this.setState({
-            firstName: values.firstName,
-            lastName: values.lastName,
+            firstName : values.firstName,
+            lastName : values.lastName,
             email: values.email,
             username: values.username,
             password: values.password,
-            passwordConfirm: values.passwordConfirm,
+            passwordConfirm: values.passwordConfirm
         })
 
-        axios.post(`http://localhost:8080/students`,JSON.stringify(this.state))
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+            axios.post(`http://localhost:8080/students`,JSON.stringify({
+              
+            }))
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
     }
 
+
+
+  
     /**(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email))  */
     validationSchema =  yup.object()
         .shape({
@@ -128,8 +131,8 @@ class Register extends Component {
             <div>
                 <div className="container">
                     <Formik
-                        onSubmit={() => this.onSubmit(this.validationSchema)}
-
+                         onSubmit={this.onSubmit}
+                         validate={this.validate}
                         validateOnBlur={false}
                         validateOnChange={false}
                         enableReinitialize={true}
