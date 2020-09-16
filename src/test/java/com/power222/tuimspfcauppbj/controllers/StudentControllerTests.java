@@ -16,9 +16,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.awt.*;
+import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(StudentController.class)
@@ -68,16 +70,74 @@ public class StudentControllerTests {
                 .andExpect(jsonPath("$.email").value("power@gmail.ca"))
                 .andExpect(jsonPath("$.phoneNumber").value("911"))
                 .andExpect(jsonPath("$.address").value("9310 Lasalle"));
-
-        //{"id":4,"username":null,"role":null,"enabled":false,
-        // "firstName":"Brutus",
-        // "lastName":null,
-        // "studentId":null,
-        // "email":null,
-        // "phoneNumber":null,
-        // "address":null}
-
-
     }
+
+    @Test
+    void createStudentTest() throws Exception{
+
+        Student s = Student.builder().enabled(true)
+                .username("etudiant")
+                .role("student")
+                .password(new BCryptPasswordEncoder().encode("password"))
+                .firstName("Bob")
+                .lastName("Brutus")
+                .id(4L)
+                .studentId("1234")
+                .email("power@gmail.ca")
+                .phoneNumber("911")
+                .address("9310 Lasalle")
+                .build();
+
+        when(studentRepository.saveAndFlush(any())).thenReturn(s);
+
+        mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":4,\"username\":\"etudiant\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.username").value("etudiant"))
+                .andExpect(jsonPath("$.role").value("student"))
+                .andExpect(jsonPath("$.enabled").value(true))
+                .andExpect(jsonPath("$.firstName").value("Bob"))
+                .andExpect(jsonPath("$.lastName").value("Brutus"))
+                .andExpect(jsonPath("$.studentId").value("1234"))
+                .andExpect(jsonPath("$.email").value("power@gmail.ca"))
+                .andExpect(jsonPath("$.phoneNumber").value("911"))
+                .andExpect(jsonPath("$.address").value("9310 Lasalle"));
+    }
+    //{"id":4,"username":"etudiant","role":"student","enabled":true,"firstName":"Bob","lastName":"Brutus","studentId":"1234","email":"power@gmail.ca","phoneNumber":"911","address":"9310 Lasalle"}
+
+   /** @Test
+    @WithMockUser("etudiant")
+    void updateStudentTest() throws Exception{
+
+        Student s = Student.builder().enabled(true)
+                .username("etudiant")
+                .role("student")
+                .password(new BCryptPasswordEncoder().encode("password"))
+                .firstName("Bob")
+                .lastName("Brutus")
+                .id(4L)
+                .studentId("1234")
+                .email("power@gmail.ca")
+                .phoneNumber("911")
+                .address("9310 Lasalle")
+                .build();
+
+        when(studentRepository.saveAndFlush(any())).thenReturn(s);
+
+        mvc.perform(put("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":4,\"username\":\"etudiant\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.username").value("etudiant"))
+                .andExpect(jsonPath("$.role").value("student"))
+                .andExpect(jsonPath("$.enabled").value(true))
+                .andExpect(jsonPath("$.firstName").value("Bob"))
+                .andExpect(jsonPath("$.lastName").value("Brutus"))
+                .andExpect(jsonPath("$.studentId").value("1234"))
+                .andExpect(jsonPath("$.email").value("power@gmail.ca"))
+                .andExpect(jsonPath("$.phoneNumber").value("911"))
+                .andExpect(jsonPath("$.address").value("9310 Lasalle"));
+    }**/
+
+
 
 }
