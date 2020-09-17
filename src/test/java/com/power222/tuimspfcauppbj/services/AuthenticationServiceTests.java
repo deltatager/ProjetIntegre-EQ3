@@ -19,9 +19,6 @@ public class AuthenticationServiceTests {
     @Autowired
     private AuthenticationService authSvc;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Test
     @WithMockUser("fk_etudiant")
     void invalidUser() {
