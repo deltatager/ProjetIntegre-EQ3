@@ -1,6 +1,11 @@
+
 import {ErrorMessage, Field, Form, Formik} from 'formik';
 import React, {Component} from 'react';
 import * as yup from 'yup';
+import axios from 'axios'
+import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
+const shortid = require('shortid');
+
 
 class RegisterStudent extends Component {
     constructor(props) {
@@ -10,6 +15,8 @@ class RegisterStudent extends Component {
             firstName: "",
             lastName: "",
             email: "",
+            phoneNumber : "",
+            address : "",
             username: "",
             password: "",
             passwordConfirm: "",
@@ -17,32 +24,71 @@ class RegisterStudent extends Component {
     }
 
     componentDidMount = () => {
-        
+
     }
 
-    onSubmit = (validationSchema) => {
-            console.log("aaaa" + validationSchema.isValid());
+    onSubmit = (values) => {
+        this.setState({
+            firstName : values.firstName,
+            lastName : values.lastName,
+            email: values.email,
+            phoneNumber : values.phoneNumber,
+            address : values.address,
+            username: values.username,
+            password: values.password,
+            passwordConfirm: values.passwordConfirm
+        })
+
+            const bodyRequest = {
+               firstName : this.state.firstName,
+               lastName : this.state.lastName,
+              email : this.state.email,
+              phoneNumber : this.state.phoneNumber,
+              studentId : shortid.generate(),
+              enabled : true,
+              role : "student",
+              address : this.state.address,
+              username : this.state.username,
+              password : this.state.password
+            }
+
+
+            console.log(this.state)
+            axios.post(`http://localhost:8080/students`,bodyRequest)
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
     }
 
+
+
+  
     /**(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email))  */
     validationSchema =  yup.object()
-    .shape({   
-        firstName : yup.string().trim().min(2,"The first name is too Short should have at least 2 characters").required(),
-        lastName : yup.string().trim().min(2).max(30).required(),
-        username: yup.string().trim().min(2).max(30).required(),
-    email: yup.string().trim().email().required(),
-    password: yup.string().trim().min(8).required(),
-    passwordConfirm: yup.string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-}
-    )
-    
+        .shape({
+                firstName : yup.string().trim().min(2,"The first name is too Short should have at least 2 characters").required(),
+                lastName : yup.string().trim().min(2).max(30).required(),
+                username: yup.string().trim().min(2).max(30).required(),
+                email: yup.string().trim().email().required(),
+                phoneNumber : yup.string().trim().required(),
+                address : yup.string().trim().required(),
+                password: yup.string().trim().min(8).required(),
+                passwordConfirm: yup.string()
+                    .oneOf([yup.ref('password'), null], 'Passwords must match')
+            }
+        )
+
     errorBlocks = () => {
         return <div>
             <ErrorMessage name="firstName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="lastName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="username" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="email" component="div" className="alert alert-warning" style={{color: 'red'}}/>
+            <ErrorMessage name="phoneNumber" component="div" className="alert alert-warning" style={{color: 'red'}}/>
+            <ErrorMessage name="address" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="password" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="passwordConfirm" component="div" className="alert alert-warning"
                           style={{color: 'red'}}/>
@@ -77,6 +123,18 @@ class RegisterStudent extends Component {
             </fieldset>
 
             <fieldset className="form-group">
+                <label>Phone Number : </label>
+                <Field style={props.errors.tel ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
+                       className="form-control" type="phone" name="phoneNumber"/>
+            </fieldset>
+
+            <fieldset className="form-group">
+                <label>Address : </label>
+                <Field style={props.errors.address ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
+                       className="form-control" type="text" name="address"/>
+            </fieldset>
+
+            <fieldset className="form-group">
                 <label>Password : </label>
                 <Field style={props.errors.password ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
                        className="form-control" type="password" name="password"/>
@@ -91,7 +149,7 @@ class RegisterStudent extends Component {
     }
 
 
-    
+
 
     render() {
         const initialValuesJson = {
@@ -100,7 +158,11 @@ class RegisterStudent extends Component {
             email: "",
             username: "",
             password: "",
-            passwordConfirm: ""
+            passwordConfirm: "",
+           phoneNumber : "",
+           enabled : true,
+           role : "",
+           address : "",
         }
 
 
@@ -108,8 +170,8 @@ class RegisterStudent extends Component {
             <div>
                 <div className="container">
                     <Formik
-                        onSubmit={() => this.onSubmit(this.validationSchema)}
-
+                         onSubmit={this.onSubmit}
+                         validate={this.validate}
                         validateOnBlur={false}
                         validateOnChange={false}
                         enableReinitialize={true}
