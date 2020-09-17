@@ -1,6 +1,8 @@
 package com.power222.tuimspfcauppbj;
 
+import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
+import com.power222.tuimspfcauppbj.model.Student;
 import com.power222.tuimspfcauppbj.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -21,6 +23,11 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
 
         @Autowired
         private UserRepository userRepo;
+
+        @Autowired
+        private StudentRepository repository;
+
+
 
         @Autowired
         private PasswordEncoder passwordEncoder;
@@ -50,6 +57,10 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
                     .role("employer")
                     .password(passwordEncoder.encode("password"))
                     .build());
+
+            //Student student1 = new Student();
+            //student1.setFirstName("Bob");
+            //repository.save(student1);
         }
     }
 
