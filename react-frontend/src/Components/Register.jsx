@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import * as yup from 'yup';
 import axios from 'axios'
 import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
-const shortid = require('shortid');
+import { v4 as uuidv4 } from 'uuid';
 
 
 class Register extends Component {
@@ -44,7 +44,7 @@ class Register extends Component {
                lastName : this.state.lastName,
               email : this.state.email,
               phoneNumber : this.state.phoneNumber,
-              studentId : shortid.generate(),
+              studentId : uuidv4(),
               enabled : true,
               role : "student",
               address : this.state.address,
@@ -53,7 +53,7 @@ class Register extends Component {
             }
 
 
-            console.log(this.state)
+            console.log(this.state.password)
             axios.post(`http://localhost:8080/students`,bodyRequest)
                 .then(function (response) {
                     console.log(response);
