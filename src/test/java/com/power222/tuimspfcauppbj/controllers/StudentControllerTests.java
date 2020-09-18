@@ -89,7 +89,7 @@ public class StudentControllerTests {
 
         when(studentRepository.saveAndFlush(any())).thenReturn(s);
 
-        mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":4,\"username\":\"etudiant\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
+        mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":4,\"username\":\"etudiant\",\"password\":\"password\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.username").value("etudiant"))
@@ -136,7 +136,7 @@ public class StudentControllerTests {
 
         when(studentRepository.saveAndFlush(any())).thenReturn(s1);
 
-        mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":5,\"username\":\"etudiant1\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
+        mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":5,\"username\":\"etudiant1\",\"password\":\"password\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.username").value("etudiant1"))

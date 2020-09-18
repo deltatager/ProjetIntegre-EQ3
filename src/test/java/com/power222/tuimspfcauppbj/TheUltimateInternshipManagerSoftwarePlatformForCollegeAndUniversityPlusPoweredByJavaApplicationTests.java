@@ -28,6 +28,7 @@ class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPow
 		assertThat(response, is(notNullValue()));
 		assertThat(response.getStatusCode(), is (equalTo(HttpStatus.OK)));
 		assertThat(response.getBody(), is(equalTo("Hello, world!")));
+
     }
 
     @Test
