@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import * as yup from 'yup';
 import axios from 'axios'
 import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService.js'
-const shortid = require('shortid');
+import { v4 as uuidv4 } from 'uuid';
 
 
 class RegisterStudent extends Component {
@@ -20,6 +20,7 @@ class RegisterStudent extends Component {
             username: "",
             password: "",
             passwordConfirm: "",
+            studentId : ""
         }
     }
 
@@ -36,6 +37,7 @@ class RegisterStudent extends Component {
             address : values.address,
             username: values.username,
             password: values.password,
+            studentId : values.studentId,
             passwordConfirm: values.passwordConfirm
         })
 
@@ -44,12 +46,10 @@ class RegisterStudent extends Component {
                lastName : this.state.lastName,
               email : this.state.email,
               phoneNumber : this.state.phoneNumber,
-              studentId : shortid.generate(),
-              enabled : true,
-              role : "student",
+              studentId : this.state.studentId,
               address : this.state.address,
               username : this.state.username,
-              password : this.state.password
+              password :  this.state.password
             }
 
 
@@ -75,6 +75,7 @@ class RegisterStudent extends Component {
                 email: yup.string().trim().email().required(),
                 phoneNumber : yup.string().trim().required(),
                 address : yup.string().trim().required(),
+                studentId : yup.string().trim().required().length(7),
                 password: yup.string().trim().min(8).required(),
                 passwordConfirm: yup.string()
                     .oneOf([yup.ref('password'), null], 'Passwords must match')
@@ -86,6 +87,7 @@ class RegisterStudent extends Component {
             <ErrorMessage name="firstName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="lastName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="username" component="div" className="alert alert-warning" style={{color: 'red'}}/>
+            <ErrorMessage name="studentId" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="email" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="phoneNumber" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="address" component="div" className="alert alert-warning" style={{color: 'red'}}/>
@@ -114,6 +116,12 @@ class RegisterStudent extends Component {
                 <label>Username : </label>
                 <Field style={props.errors.username ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
                        className="form-control" type="text" name="username"/>
+            </fieldset>
+
+            <fieldset className="form-group">
+                <label>Student Id : </label>
+                <Field style={props.errors.studentId ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
+                       className="form-control" type="text" name="studentId"/>
             </fieldset>
 
             <fieldset className="form-group">
@@ -159,6 +167,7 @@ class RegisterStudent extends Component {
             username: "",
             password: "",
             passwordConfirm: "",
+            studentId : "",
            phoneNumber : "",
            enabled : true,
            role : "",
