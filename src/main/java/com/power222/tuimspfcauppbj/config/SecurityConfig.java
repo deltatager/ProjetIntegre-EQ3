@@ -3,7 +3,6 @@ package com.power222.tuimspfcauppbj.config;
 import com.power222.tuimspfcauppbj.util.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -49,8 +48,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
 
-                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-                .antMatchers(HttpMethod.POST,"/students").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/students").permitAll()
+                .antMatchers(HttpMethod.POST, "/employers").permitAll()
                 .antMatchers("/h2-console/*").permitAll()
                 .antMatchers("/hello").permitAll()
 

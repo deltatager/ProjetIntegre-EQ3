@@ -1,7 +1,6 @@
 package com.power222.tuimspfcauppbj.controllers;
 
 import com.power222.tuimspfcauppbj.controller.DemoController;
-import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.User;
 import org.junit.jupiter.api.Test;
@@ -27,16 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DemoController.class)
 public class DemoControllerTests {
 
-    //Pour que Spring ne plante pas au CommandLineRunner
-    @MockBean
-    private StudentRepository studentRepository;
-    //------------------
-
     @MockBean
     private UserRepository userRepo;
-
-    @MockBean
-    private StudentRepository studentRepository;
 
     @Autowired
     private MockMvc mvc;
