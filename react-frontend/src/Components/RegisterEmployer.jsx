@@ -7,6 +7,7 @@ import {Field, Formik} from "formik";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import * as yup from "yup";
 import {TextField} from "formik-material-ui";
+import axios from 'axios'
 
 const useStyles = makeStyles((theme) => ({
     form: {
@@ -20,31 +21,26 @@ const useStyles = makeStyles((theme) => ({
 
 const tooShortError = (value) => "Doit avoir au moins " + value.min + " caractères";
 const tooLongError = (value) => "Doit avoir au plus " + value.max + " caractères";
+const requiredFieldMsg = "Ce champs est requis";
 
 export default function RegisterEmployer() {
     const classes = useStyles();
     let validationSchema =  yup.object()
         .shape({
-                companyName :    yup.string().trim().min(5, tooShortError).required("Ce champs est requis"),
-                companyAddress:  yup.string().trim().min(10, tooShortError).required("Ce champs est requis"),
-                contactName :    yup.string().trim().min(5, tooShortError).max(50, tooLongError).required("Ce champs est requis"),
-                phoneNumber :    yup.string().trim().min(10, tooShortError).required("Ce champs est requis"),
-                username:        yup.string().trim().min(5, tooShortError).max(30, tooLongError).required("Ce champs est requis"),
-                email:           yup.string().trim().email().required("Ce champs est requis"),
-                password:        yup.string().trim().min(8, tooShortError).required("Ce champs est requis"),
-                passwordConfirm: yup.string()
-                    .oneOf([yup.ref('password'), null], "Les mots de passes doivent êtres identiques").required("Ce champs est requis"),
-            });
-    let onSubmit = (validationSchema, values, setSubmitting) => {
-        setTimeout(() => {
-            setSubmitting(false);
-            validationSchema.isValid(values).then(b => console.log(b))
-        }, 500);
-    };
+            companyName: yup.string().trim().min(5, tooShortError).required(requiredFieldMsg),
+            companyAddress: yup.string().trim().min(10, tooShortError).required(requiredFieldMsg),
+            contactName: yup.string().trim().min(5, tooShortError).max(50, tooLongError).required(requiredFieldMsg),
+            phoneNumber: yup.string().trim().min(10, tooShortError).required(requiredFieldMsg),
+            username: yup.string().trim().min(5, tooShortError).max(30, tooLongError).required(requiredFieldMsg),
+            email: yup.string().trim().email().required(requiredFieldMsg),
+            password: yup.string().trim().min(8, tooShortError).required(requiredFieldMsg),
+            passwordConfirm: yup.string()
+                .oneOf([yup.ref('password'), null], "Les mots de passes doivent êtres identiques").required(requiredFieldMsg),
+        });
 
     return (
         <Formik
-            onSubmit={(values, action) => onSubmit(validationSchema, values, action.setSubmitting)}
+            onSubmit={async (values) => axios.post(`http://localhost:8080/employer`, values)}
 
             validateOnBlur={false}
             validateOnChange={false}
