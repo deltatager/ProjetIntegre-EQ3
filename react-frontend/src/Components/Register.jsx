@@ -51,7 +51,7 @@ class Register extends Component {
               role : "student",
               address : this.state.address,
               username : this.state.username,
-              password :  window.btoa(this.state.password)
+              password :  this.state.password
             }
 
 
