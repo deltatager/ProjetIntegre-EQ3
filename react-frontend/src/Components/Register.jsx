@@ -20,6 +20,7 @@ class Register extends Component {
             username: "",
             password: "",
             passwordConfirm: "",
+            studentId : ""
         }
     }
 
@@ -36,6 +37,7 @@ class Register extends Component {
             address : values.address,
             username: values.username,
             password: values.password,
+            studentId : values.studentId,
             passwordConfirm: values.passwordConfirm
         })
 
@@ -44,12 +46,12 @@ class Register extends Component {
                lastName : this.state.lastName,
               email : this.state.email,
               phoneNumber : this.state.phoneNumber,
-              studentId : uuidv4(),
+              studentId : this.state.studentId,
               enabled : true,
               role : "student",
               address : this.state.address,
               username : this.state.username,
-              password : this.state.password
+              password :  window.btoa(this.state.password)
             }
 
 
@@ -75,6 +77,7 @@ class Register extends Component {
                 email: yup.string().trim().email().required(),
                 phoneNumber : yup.string().trim().required(),
                 address : yup.string().trim().required(),
+                studentId : yup.string().trim().required().length(7),
                 password: yup.string().trim().min(8).required(),
                 passwordConfirm: yup.string()
                     .oneOf([yup.ref('password'), null], 'Passwords must match')
@@ -86,6 +89,7 @@ class Register extends Component {
             <ErrorMessage name="firstName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="lastName" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="username" component="div" className="alert alert-warning" style={{color: 'red'}}/>
+            <ErrorMessage name="studentId" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="email" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="phoneNumber" component="div" className="alert alert-warning" style={{color: 'red'}}/>
             <ErrorMessage name="address" component="div" className="alert alert-warning" style={{color: 'red'}}/>
@@ -114,6 +118,12 @@ class Register extends Component {
                 <label>Username : </label>
                 <Field style={props.errors.username ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
                        className="form-control" type="text" name="username"/>
+            </fieldset>
+
+            <fieldset className="form-group">
+                <label>Student Id : </label>
+                <Field style={props.errors.studentId ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
+                       className="form-control" type="text" name="studentId"/>
             </fieldset>
 
             <fieldset className="form-group">
@@ -159,6 +169,7 @@ class Register extends Component {
             username: "",
             password: "",
             passwordConfirm: "",
+            studentId : "",
            phoneNumber : "",
            enabled : true,
            role : "",
