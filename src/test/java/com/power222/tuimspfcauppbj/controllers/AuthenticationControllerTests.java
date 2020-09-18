@@ -1,6 +1,7 @@
 package com.power222.tuimspfcauppbj.controllers;
 
 import com.power222.tuimspfcauppbj.controller.AuthenticationController;
+import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.User;
 import com.power222.tuimspfcauppbj.service.AuthenticationService;
@@ -24,6 +25,9 @@ public class AuthenticationControllerTests {
 
     @MockBean
     private AuthenticationService authSvc;
+
+    @MockBean
+    private StudentRepository studentRepository;
 
     @Autowired
     private MockMvc mvc;

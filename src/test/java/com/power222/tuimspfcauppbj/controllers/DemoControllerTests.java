@@ -35,6 +35,9 @@ public class DemoControllerTests {
     @MockBean
     private UserRepository userRepo;
 
+    @MockBean
+    private StudentRepository studentRepository;
+
     @Autowired
     private MockMvc mvc;
 
