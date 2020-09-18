@@ -9,6 +9,27 @@ class AuthenticationRegistrationService{
                }
            )
      }
+
+
+     isUserLoggedIn(){
+        return sessionStorage.getItem("authenticaredUser") != null  
+    }
+
+    getLoggedInUser(){
+        return sessionStorage.getItem("authenticaredUser")
+    }
+
+    logout(){
+        sessionStorage.removeItem("authenticaredUser")
+    }
+
+    registerSuccesfulLogin = (username,password) =>{
+        sessionStorage.setItem("authenticaredUser",username)
+        this.setUpAxiosInterceptors('Basic ' + window.btoa(username + ":" + password))
+    }
+
+
+
 }
 
 export default new AuthenticationRegistrationService()
