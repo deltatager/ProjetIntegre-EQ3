@@ -1,8 +1,5 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import React,{Component} from 'react';
-import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService';
-const axios = require("axios");
-
 class Login extends Component {
     constructor(props) {
         super(props);
@@ -23,7 +20,7 @@ class Login extends Component {
             username : values.username,
             password : values.password
         });
-        
+
         console.log(values.username + ":" + values.password);
         console.log(window.btoa(this.state.username + ":" + this.state.password));
 
@@ -89,7 +86,7 @@ class Login extends Component {
             <fieldset className="form-group">
                 <label>Username : </label>
                 <Field style={props.errors.username ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
-                       className="form-control" type="text" name="username" id="username"/>
+                       className="form-control" type="text" name="username"/>
             </fieldset>
 
             <fieldset className="form-group">
