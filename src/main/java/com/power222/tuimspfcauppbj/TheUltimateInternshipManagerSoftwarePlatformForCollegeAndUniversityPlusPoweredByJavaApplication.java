@@ -18,7 +18,6 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
 
     @Profile("!noBootstrappingTests")
     @Component
-    @Profile("!test")
     public static class BootstrapConfig implements CommandLineRunner {
 
         private final UserRepository userRepo;
