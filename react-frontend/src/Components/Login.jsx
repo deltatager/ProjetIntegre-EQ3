@@ -6,12 +6,6 @@ const axios = require("axios");
 class Login extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            username: "",
-            password: "",
-            user: {}
-        }
     }
 
     componentDidMount = () => {
@@ -19,14 +13,6 @@ class Login extends Component {
     }
 
     onSubmit = (values) => {
-        this.setState({
-            username : values.username,
-            password : values.password
-        });
-        
-        console.log(values.username + ":" + values.password);
-        console.log(window.btoa(this.state.username + ":" + this.state.password));
-
         axios({
             method: "GET",
             url: "http://localhost:8080/auth/user",
@@ -34,39 +20,14 @@ class Login extends Component {
                 authorization: "Basic " + window.btoa(values.username + ":" + values.password)
             }
         }).then((response) => {
-            // console.log(response.data)
+            let user = response.data
 
-            this.setState({
-                user : response.data
-            })
+            AuthenticationRegistrationService.saveValueToSession("authenticatedUser", JSON.stringify(user))
 
-            console.log(this.state.user)
-
-            AuthenticationRegistrationService.saveValueToSession("authenticatedUser", JSON.stringify(this.state.user))
-            console.log(JSON.parse(AuthenticationRegistrationService.getValueFromSession("authenticatedUser")).username)
             this.props.history.push("/welcome")
         }).catch((error) => {
             console.log(error)
         })
-
-        // axios({
-        //     method: "GET",
-        //     url: "http://localhost:8080/auth/basic",
-        //     headers: {
-        //         authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
-        //     }
-        // }).then((response) => {
-        //     console.log(response);
-
-        //     // AuthenticationRegistrationService.setupAxiosInterceptors(this.state.username, this.state.password)
-
-        //     // console.log(this.props);
-
-        //     // AuthenticationRegistrationService.saveValueToSession("authenticatedUser", this.state.user)
-        //     // this.props.history.push("/welcome")
-        // }).catch(function (error) {
-        //     console.log(error);
-        // });
     }
 
 
@@ -122,10 +83,13 @@ class Login extends Component {
                         initialValues={initialValuesJson}
                     >
 
-                        {/* anonymus method
-                        tous les attribu name doivent avoir le meme nom que les variables du  state
-                        */
+                        {
+                            /*
+                                Méthode anonyme
+                                Les attributs et les variables du state doivent avoir des noms identiques.
+                            */
                         }
+                        
                         {
                             (props) => (
                                 <Form>
