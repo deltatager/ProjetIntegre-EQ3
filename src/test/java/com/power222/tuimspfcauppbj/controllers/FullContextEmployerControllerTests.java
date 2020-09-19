@@ -14,8 +14,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@ActiveProfiles("noSecurityTests") //todo: whatever black magic i did here
+@ActiveProfiles("noSecurityTests")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FullContextEmployerControllerTests {
 
@@ -25,11 +26,11 @@ public class FullContextEmployerControllerTests {
     @Autowired
     private EmployerRepository employerRepo;
 
-    private Employer oldEmp; //todo rename
+    private Employer expected;
 
     @BeforeEach
     private void beforeEach() {
-        oldEmp = Employer.builder()
+        expected = Employer.builder()
                 .username("employer")
                 .password("password")
                 .companyName("AL")
@@ -49,42 +50,43 @@ public class FullContextEmployerControllerTests {
     void updateEmployerTest() {
 
         ResponseEntity<Employer> response = restTemplate.withBasicAuth("admin", "password")
-                .postForEntity("/employers", oldEmp, Employer.class);
+                .postForEntity("/employers", expected, Employer.class);
 
         updateOldEmp(response);
 
         assertThat(response, is(notNullValue()));
-        assertThat(response.getBody(), is(equalTo(oldEmp)));
-        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED))); //todo move before body
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
+        assertThat(response.getBody(), is(equalTo(expected)));
 
-        oldEmp.setPhoneNumber("9876543210");
+        expected.setPhoneNumber("9876543210");
 
         restTemplate.withBasicAuth("admin", "password")
-                .put("/employers/" + oldEmp.getId(), oldEmp);
+                .put("/employers/" + expected.getId(), expected);
 
         response = restTemplate.withBasicAuth("admin", "password")
-                .getForEntity("/employers/" + oldEmp.getId(), Employer.class);
-        assertThat(response.getBody(), is(equalTo(oldEmp)));
-        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK))); //todo move before body
+                .getForEntity("/employers/" + expected.getId(), Employer.class);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
+        assertThat(response.getBody(), is(equalTo(expected)));
     }
 
     @Test
     void deleteEmployerTest() {
 
         ResponseEntity<Employer> response = restTemplate.withBasicAuth("admin", "password")
-                .postForEntity("/employers", oldEmp, Employer.class);
+                .postForEntity("/employers", expected, Employer.class);
 
         updateOldEmp(response);
 
         assertThat(response, is(notNullValue()));
-        assertThat(response.getBody(), is(equalTo(oldEmp)));
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED)); //todo move before body
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(response.getBody(), is(equalTo(expected)));
 
         restTemplate.withBasicAuth("admin", "password")
-                .delete("/employers/" + oldEmp.getId());
+                .delete("/employers/" + expected.getId());
 
         response = restTemplate.withBasicAuth("admin", "password")
-                .getForEntity("/employers/" + oldEmp.getId(), Employer.class);
+                .getForEntity("/employers/" + expected.getId(), Employer.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
     }
@@ -92,21 +94,22 @@ public class FullContextEmployerControllerTests {
     @Test
     void verifierUsernameUnique() {
 
-        ResponseEntity<Employer> response = restTemplate.postForEntity("/employers", oldEmp, Employer.class);
+        ResponseEntity<Employer> response = restTemplate.postForEntity("/employers", expected, Employer.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
 
         response = restTemplate.withBasicAuth("admin", "password")
-                .postForEntity("/employers", oldEmp, Employer.class);
+                .postForEntity("/employers", expected, Employer.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CONFLICT)));
 
     }
 
     private void updateOldEmp(ResponseEntity<Employer> response) {
-        oldEmp.setId(response.getBody().getId());
-        oldEmp.setRole("employer");
-        oldEmp.setEnabled(true);
-        // pcq le bcrypt change chaque fois
-        //response.getBody().setPassword("password");
-        //Todo: explain why i removed it (NoOp encoder)
+        if (!response.hasBody())
+            fail("Response body should no be empty");
+
+        //noinspection ConstantConditions
+        expected.setId(response.getBody().getId());
+        expected.setRole("employer");
+        expected.setEnabled(true);
     }
 }

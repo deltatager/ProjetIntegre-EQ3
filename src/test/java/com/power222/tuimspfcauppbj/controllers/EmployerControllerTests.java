@@ -1,6 +1,7 @@
 package com.power222.tuimspfcauppbj.controllers;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.power222.tuimspfcauppbj.config.TestsWithoutSecurityConfig;
 import com.power222.tuimspfcauppbj.controller.EmployerController;
 import com.power222.tuimspfcauppbj.dao.EmployerRepository;
@@ -11,44 +12,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles({"noSecurityTests", "noBootstrappingTests"})
 @Import({TestsWithoutSecurityConfig.class})
 @WebMvcTest(EmployerController.class)
 public class EmployerControllerTests {
 
-    //Pour que Spring ne plante pas au CommandLineRunner
-    //@MockBean
-    //private UserRepository userRepository;
-    //Todo: explain why i removed it (NoOp encoder)
+    @Autowired
+    private MockMvc mvc;
 
-    //todo: objectMapper and remove all JSON nonsense
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private EmployerRepository empRepo;
 
-    @Autowired
-    private MockMvc mvc;
-
-    private Employer emp; //todo rename
+    private Employer expected;
 
     @BeforeEach
     private void beforeEach() {
-        emp = Employer.builder()
+        expected = Employer.builder()
                 .enabled(true)
                 .id(1L)
                 .username("employer")
@@ -63,54 +61,45 @@ public class EmployerControllerTests {
     }
 
     @Test
-    @WithMockUser("employer")
     void getEmployerTest() throws Exception {
+        when(empRepo.findById(1L)).thenReturn(Optional.ofNullable(expected));
 
-        when(empRepo.findById(1L)).thenReturn(Optional.ofNullable(emp));
+        MvcResult result = mvc.perform(get("/employers/1").contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        mvc.perform(get("/employers/1").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.enabled").value("true"))
-                .andExpect(jsonPath("$.role").value("employer"))
-                .andExpect(jsonPath("$.username").value("employer"))
-                .andExpect(jsonPath("$.companyName").value("AL"))
-                .andExpect(jsonPath("$.contactName").value("emp1"))
-                .andExpect(jsonPath("$.phoneNumber").value("0123456789"))
-                .andExpect(jsonPath("$.address").value("123claurendeau"))
-                .andExpect(jsonPath("$.email").value("123@claurendeau.qc.ca"));
+        Employer actual = objectMapper.readValue(result.getResponse().getContentAsString(), Employer.class);
+
+        assertEquals(result.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(expected, actual);
     }
 
     @Test
     void createEmployerTest() throws Exception {
+        when(empRepo.saveAndFlush(any())).thenReturn(expected);
 
-        when(empRepo.saveAndFlush(any())).thenReturn(emp);
+        MvcResult result = mvc.perform(post("/employers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(expected))).andReturn();
 
-        mvc.perform(post("/employers").contentType(MediaType.APPLICATION_JSON).content("{\"id\":1,\"username\":\"employer\",\"password\":\"password\",\"role\":\"employer\",\"enabled\":true,\"companyName\":\"AL\",\"contactName\":\"emp1\",\"phoneNumber\":\"0123456789\",\"address\":\"123claurendeau\",\"email\":\"123@claurendeau.qc.ca\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.enabled").value("true"))
-                .andExpect(jsonPath("$.role").value("employer"))
-                .andExpect(jsonPath("$.username").value("employer"))
-                .andExpect(jsonPath("$.companyName").value("AL"))
-                .andExpect(jsonPath("$.contactName").value("emp1"))
-                .andExpect(jsonPath("$.phoneNumber").value("0123456789"))
-                .andExpect(jsonPath("$.address").value("123claurendeau"))
-                .andExpect(jsonPath("$.email").value("123@claurendeau.qc.ca"));
+        Employer actual = objectMapper.readValue(result.getResponse().getContentAsString(), Employer.class);
+
+        assertEquals(result.getResponse().getStatus(), HttpStatus.CREATED.value());
+        assertEquals(expected, actual);
     }
 
     @Test
-    @WithMockUser("employer")
     void getAllEmployers() throws Exception {
-        List<Employer> listEmp = new ArrayList<>();
-        for (int i = 0; i < 3; i++)
-            listEmp.add(new Employer());
+        final int nbEmployer = 3;
 
-        when(empRepo.findAll()).thenReturn(listEmp);
+        List<Employer> employerList = new ArrayList<>();
+        for (int i = 0; i < nbEmployer; i++)
+            employerList.add(new Employer());
 
-        mvc.perform(get("/employers"))
-                .andExpect(status().isOk());
+        when(empRepo.findAll()).thenReturn(employerList);
 
-        //TODO: test count of list w/ objectMapper
+        MvcResult result = mvc.perform(get("/employers")).andReturn();
+        var actuals = objectMapper.readValue(result.getResponse().getContentAsString(), List.class);
+
+        assertEquals(result.getResponse().getStatus(), HttpStatus.OK.value());
+        assertEquals(actuals.size(), nbEmployer);
     }
 }
