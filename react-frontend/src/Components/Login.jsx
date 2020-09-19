@@ -14,17 +14,6 @@ class Login extends Component {
     }
 
     onSubmit = (values) => {
-<<<<<<< HEAD
-=======
-        this.setState({
-            username : values.username,
-            password : values.password
-        });
-
-        console.log(values.username + ":" + values.password);
-        console.log(window.btoa(this.state.username + ":" + this.state.password));
-
->>>>>>> 39ae73da1e5d0bc4c0be560e80e94d8e21e2efda
         axios({
             method: "GET",
             url: "http://localhost:8080/auth/user",
