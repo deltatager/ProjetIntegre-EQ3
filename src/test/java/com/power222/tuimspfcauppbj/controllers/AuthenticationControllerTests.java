@@ -31,7 +31,7 @@ public class AuthenticationControllerTests {
     private AuthenticationService authSvc;
 
     @MockBean
-    private StudentRepository studentRepository;
+    private StudentRepository repository;
 
     @Autowired
     private MockMvc mvc;
