@@ -27,16 +27,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DemoController.class)
 public class DemoControllerTests {
 
-    //Pour que Spring ne plante pas au CommandLineRunner
-    @MockBean
-    private StudentRepository studentRepository;
-    //------------------
-
     @MockBean
     private UserRepository userRepo;
 
     @MockBean
     private StudentRepository repository;
+
 
     @Autowired
     private MockMvc mvc;

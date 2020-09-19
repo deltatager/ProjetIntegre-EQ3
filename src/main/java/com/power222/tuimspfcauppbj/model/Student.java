@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @Entity

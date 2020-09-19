@@ -23,13 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuthenticationController.class)
 public class AuthenticationControllerTests {
 
-    //Pour que Spring ne plante pas au CommandLineRunner
-    @MockBean
-    private UserRepository userRepository;
-    @MockBean
-    private StudentRepository studentRepository;
-    //------------------
-
     @MockBean
     private AuthenticationService authSvc;
 

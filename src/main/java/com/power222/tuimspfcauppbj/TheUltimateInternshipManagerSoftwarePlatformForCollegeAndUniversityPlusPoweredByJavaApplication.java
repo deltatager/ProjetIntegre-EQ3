@@ -1,9 +1,7 @@
 package com.power222.tuimspfcauppbj;
 
-import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,19 +20,16 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
     @Profile("!test")
     public static class BootstrapConfig implements CommandLineRunner {
 
-        @Autowired
-        private UserRepository userRepo;
+        private final UserRepository userRepo;
+        private final PasswordEncoder passwordEncoder;
 
-        @Autowired
-        private StudentRepository repository;
-
-
-
-        @Autowired
-        private PasswordEncoder passwordEncoder;
+        public BootstrapConfig(UserRepository userRepo, PasswordEncoder passwordEncoder) {
+            this.userRepo = userRepo;
+            this.passwordEncoder = passwordEncoder;
+        }
 
         @Override
-        public void run(String... args) throws Exception {
+        public void run(String... args) {
             if (userRepo.count() != 0)
                 return;
 
@@ -58,10 +53,6 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
                     .role("employer")
                     .password(passwordEncoder.encode("password"))
                     .build());
-
-            //Student student1 = new Student();
-            //student1.setFirstName("Bob");
-            //repository.save(student1);
         }
     }
 
