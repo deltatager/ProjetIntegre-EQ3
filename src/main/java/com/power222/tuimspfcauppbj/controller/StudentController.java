@@ -48,7 +48,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(@RequestBody Student newStudent, @PathVariable long id){
+    public ResponseEntity<Student> updateStudent(@RequestBody Student newStudent, @PathVariable long id) {
         Optional<Student> optStudent = repository.findById(id).map(oldStudent -> {
             newStudent.setId(oldStudent.getId());
             return repository.saveAndFlush(newStudent);
@@ -59,12 +59,9 @@ public class StudentController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public void deleteStudent(@PathVariable long id){
+    public void deleteStudent(@PathVariable long id) {
         repository.deleteById(id);
     }
-
-
-
 
 
 }
