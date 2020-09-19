@@ -20,6 +20,7 @@ public class FullContextStudentControllerTests {
     @Test
     void udpateStudentTest() {
 
+
         Student s = Student.builder()
                 .username("etudiant")
                 .password("password")
@@ -95,6 +96,31 @@ public class FullContextStudentControllerTests {
                 .getForEntity("/students/" + oldStudent.getId(), Student.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
+    }
+
+    @Test
+    void verifierUsernameUniqueTest() {
+        Student oldStudent = Student.builder()
+                .username("etudiant")
+                .password("password")
+                .firstName("Bob")
+                .lastName("Brutus")
+                .studentId("1234")
+                .email("power@gmail.ca")
+                .phoneNumber("911")
+                .address("9310 Lasalle")
+                .build();
+
+        ResponseEntity<Student> response = restTemplate
+                .withBasicAuth("admin", "password")
+                .postForEntity("/students", oldStudent, Student.class);
+
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
+
+        response = restTemplate
+                .withBasicAuth("admin", "password")
+                .postForEntity("/students", oldStudent, Student.class);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CONFLICT)));
     }
 
 }
