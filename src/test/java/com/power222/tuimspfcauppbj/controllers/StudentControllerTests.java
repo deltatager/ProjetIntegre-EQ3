@@ -1,15 +1,15 @@
 package com.power222.tuimspfcauppbj.controllers;
 
+import com.power222.tuimspfcauppbj.config.TestsWithoutSecurityConfig;
 import com.power222.tuimspfcauppbj.controller.StudentController;
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
-import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Student;
-import com.power222.tuimspfcauppbj.service.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -25,30 +25,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"noSecurityTests", "noBootstrappingTests"})
+@Import({TestsWithoutSecurityConfig.class})
 @WebMvcTest(StudentController.class)
 public class StudentControllerTests {
 
-    @MockBean
-    private UserRepository userRepository;
+    //@MockBean
+    //private UserRepository userRepository;
+    //Todo: explain why i removed it (profiles)
 
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    private AuthenticationService authSvc;
-
-    @MockBean
     private StudentRepository studentRepository;
 
-    Student stud;
+    Student stud; //todo private & rename
 
     @BeforeEach
     void beforeEach() {
         stud = Student.builder().enabled(true)
                 .username("etudiant")
                 .role("student")
-                .password(new BCryptPasswordEncoder().encode("password"))
+                .password(new BCryptPasswordEncoder().encode("password")) //todo remove
                 .firstName("Bob")
                 .lastName("Brutus")
                 .id(4L)
@@ -64,10 +63,11 @@ public class StudentControllerTests {
     @WithMockUser("etudiant")
     void getStudentByIdTest() throws Exception {
 
+        //todo remove use field
         Student s = Student.builder().enabled(true)
                 .username("etudiant")
                 .role("student")
-                .password(new BCryptPasswordEncoder().encode("password"))
+                .password(new BCryptPasswordEncoder().encode("password")) //todo remove
                 .firstName("Bob")
                 .lastName("Brutus")
                 .id(4L)
@@ -97,10 +97,11 @@ public class StudentControllerTests {
     @Test
     void createStudentTest() throws Exception{
 
+        //todo remove use field
         Student s = Student.builder().enabled(true)
                 .username("etudiant")
                 .role("student")
-                .password(new BCryptPasswordEncoder().encode("password"))
+                .password(new BCryptPasswordEncoder().encode("password")) //todo remove
                 .firstName("Bob")
                 .lastName("Brutus")
                 .id(4L)
@@ -139,6 +140,8 @@ public class StudentControllerTests {
         when(studentRepository.findAll()).thenReturn(studentList);
         mvc.perform(get("/students"))
                 .andExpect(status().isOk());
+
+        //TODO: test count of list /w objectMapper
     }
 
 

@@ -10,10 +10,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@ActiveProfiles("noSecurityTests") //todo: whatever black magic i did here
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FullContextEmployerControllerTests {
 
@@ -23,7 +25,7 @@ public class FullContextEmployerControllerTests {
     @Autowired
     private EmployerRepository employerRepo;
 
-    private Employer oldEmp;
+    private Employer oldEmp; //todo rename
 
     @BeforeEach
     private void beforeEach() {
@@ -53,7 +55,7 @@ public class FullContextEmployerControllerTests {
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getBody(), is(equalTo(oldEmp)));
-        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED))); //todo move before body
 
         oldEmp.setPhoneNumber("9876543210");
 
@@ -63,7 +65,7 @@ public class FullContextEmployerControllerTests {
         response = restTemplate.withBasicAuth("admin", "password")
                 .getForEntity("/employers/" + oldEmp.getId(), Employer.class);
         assertThat(response.getBody(), is(equalTo(oldEmp)));
-        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK))); //todo move before body
     }
 
     @Test
@@ -76,7 +78,7 @@ public class FullContextEmployerControllerTests {
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getBody(), is(equalTo(oldEmp)));
-        assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(response.getStatusCode(), is(HttpStatus.CREATED)); //todo move before body
 
         restTemplate.withBasicAuth("admin", "password")
                 .delete("/employers/" + oldEmp.getId());
@@ -90,8 +92,7 @@ public class FullContextEmployerControllerTests {
     @Test
     void verifierUsernameUnique() {
 
-        ResponseEntity<Employer> response = restTemplate.withBasicAuth("admin", "password")
-                .postForEntity("/employers", oldEmp, Employer.class);
+        ResponseEntity<Employer> response = restTemplate.postForEntity("/employers", oldEmp, Employer.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
 
         response = restTemplate.withBasicAuth("admin", "password")
@@ -105,6 +106,7 @@ public class FullContextEmployerControllerTests {
         oldEmp.setRole("employer");
         oldEmp.setEnabled(true);
         // pcq le bcrypt change chaque fois
-        response.getBody().setPassword("password");
+        //response.getBody().setPassword("password");
+        //Todo: explain why i removed it (NoOp encoder)
     }
 }

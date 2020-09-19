@@ -10,10 +10,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+@ActiveProfiles("noSecurityTests") //todo: whatever black magic i did here
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FullContextStudentControllerTests {
 
@@ -21,7 +23,7 @@ public class FullContextStudentControllerTests {
     private TestRestTemplate restTemplate;
 
 
-    private Student oldStudent;
+    private Student oldStudent; //TODO: Move down & rename
 
     @Autowired
     private StudentRepository repository;
@@ -29,7 +31,7 @@ public class FullContextStudentControllerTests {
     @BeforeEach
     private void beforeEach() {
         oldStudent = Student.builder()
-                .username("etudiant")
+                .username("etudiant2")//TODO: explain why change username
                 .password("password")
                 .firstName("Bob")
                 .lastName("Brutus")
@@ -59,7 +61,8 @@ public class FullContextStudentControllerTests {
         oldStudent.setEnabled(true);
 
         //le hash bcrypt change chaque foit
-        response.getBody().setPassword("password");
+        //response.getBody().setPassword("password");
+        //Todo: explain why i removed it (NoOp encoder)
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
@@ -81,7 +84,6 @@ public class FullContextStudentControllerTests {
     @Test
     void deleteStudentTest() {
 
-
         ResponseEntity<Student> response = restTemplate
                 .withBasicAuth("admin", "password")
                 .postForEntity("/students", oldStudent, Student.class);
@@ -91,11 +93,12 @@ public class FullContextStudentControllerTests {
         oldStudent.setEnabled(true);
 
         //le hash bcrypt change chaque foit
-        response.getBody().setPassword("password");
+        //response.getBody().setPassword("password");
+        //Todo: explain why i removed it (NoOp encoder)
 
         assertThat(response, is(notNullValue()));
-        assertThat(response.getBody(), is(equalTo(oldStudent)));
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(response.getBody(), is(equalTo(oldStudent)));
 
         restTemplate.withBasicAuth("admin", "password")
                 .delete("/students/" + oldStudent.getId());

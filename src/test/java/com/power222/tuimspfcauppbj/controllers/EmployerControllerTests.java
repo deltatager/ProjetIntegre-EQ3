@@ -1,16 +1,16 @@
 package com.power222.tuimspfcauppbj.controllers;
 
 
+import com.power222.tuimspfcauppbj.config.TestsWithoutSecurityConfig;
 import com.power222.tuimspfcauppbj.controller.EmployerController;
 import com.power222.tuimspfcauppbj.dao.EmployerRepository;
-import com.power222.tuimspfcauppbj.dao.StudentRepository;
-import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Employer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,16 +26,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ActiveProfiles("test")
+@ActiveProfiles({"noSecurityTests", "noBootstrappingTests"})
+@Import({TestsWithoutSecurityConfig.class})
 @WebMvcTest(EmployerController.class)
 public class EmployerControllerTests {
 
     //Pour que Spring ne plante pas au CommandLineRunner
-    @MockBean
-    private UserRepository userRepository;
+    //@MockBean
+    //private UserRepository userRepository;
+    //Todo: explain why i removed it (NoOp encoder)
 
-    @MockBean
-    private StudentRepository studentRepository;
+    //todo: objectMapper and remove all JSON nonsense
 
     @MockBean
     private EmployerRepository empRepo;
@@ -43,7 +44,7 @@ public class EmployerControllerTests {
     @Autowired
     private MockMvc mvc;
 
-    private Employer emp;
+    private Employer emp; //todo rename
 
     @BeforeEach
     private void beforeEach() {
@@ -109,5 +110,7 @@ public class EmployerControllerTests {
 
         mvc.perform(get("/employers"))
                 .andExpect(status().isOk());
+
+        //TODO: test count of list w/ objectMapper
     }
 }

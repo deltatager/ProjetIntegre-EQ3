@@ -1,9 +1,7 @@
 package com.power222.tuimspfcauppbj;
 
-import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +16,7 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
         SpringApplication.run(TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPoweredByJavaApplication.class, args);
     }
 
-    @Profile("!test")
+    @Profile("!noBootstrappingTests")
     @Component
     public static class BootstrapConfig implements CommandLineRunner {
 
