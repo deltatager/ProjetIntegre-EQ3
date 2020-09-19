@@ -5,6 +5,7 @@ import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Student;
 import com.power222.tuimspfcauppbj.service.AuthenticationService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -37,9 +41,28 @@ public class StudentControllerTests {
     @MockBean
     private StudentRepository studentRepository;
 
+    Student stud;
+
+    @BeforeEach
+    void beforeEach() {
+        stud = Student.builder().enabled(true)
+                .username("etudiant")
+                .role("student")
+                .password(new BCryptPasswordEncoder().encode("password"))
+                .firstName("Bob")
+                .lastName("Brutus")
+                .id(4L)
+                .studentId("1234")
+                .email("power@gmail.ca")
+                .phoneNumber("911")
+                .address("9310 Lasalle")
+                .build();
+    }
+
+
     @Test
     @WithMockUser("etudiant")
-    void getStudentByIdTest() throws Exception{
+    void getStudentByIdTest() throws Exception {
 
         Student s = Student.builder().enabled(true)
                 .username("etudiant")
@@ -103,89 +126,19 @@ public class StudentControllerTests {
                 .andExpect(jsonPath("$.address").value("9310 Lasalle"));
     }
 
-    @Test
-    void createStudentDifferentUsernameTest() throws Exception{
-
-        Student s = Student.builder().enabled(true)
-                .username("etudiant")
-                .role("student")
-                .password(new BCryptPasswordEncoder().encode("password"))
-                .firstName("Bob")
-                .lastName("Brutus")
-                .id(4L)
-                .studentId("1234")
-                .email("power@gmail.ca")
-                .phoneNumber("911")
-                .address("9310 Lasalle")
-                .build();
-
-        studentRepository.saveAndFlush(s);
-
-        Student s1 = Student.builder().enabled(true)
-                .username("etudiant1")
-                .role("student")
-                .password(new BCryptPasswordEncoder().encode("password"))
-                .firstName("Bob")
-                .lastName("Brutus")
-                .id(5L)
-                .studentId("1234")
-                .email("power@gmail.ca")
-                .phoneNumber("911")
-                .address("9310 Lasalle")
-                .build();
-
-        when(studentRepository.saveAndFlush(any())).thenReturn(s1);
-
-        mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":5,\"username\":\"etudiant1\",\"password\":\"password\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.username").value("etudiant1"))
-                .andExpect(jsonPath("$.role").value("student"))
-                .andExpect(jsonPath("$.enabled").value(true))
-                .andExpect(jsonPath("$.firstName").value("Bob"))
-                .andExpect(jsonPath("$.lastName").value("Brutus"))
-                .andExpect(jsonPath("$.studentId").value("1234"))
-                .andExpect(jsonPath("$.email").value("power@gmail.ca"))
-                .andExpect(jsonPath("$.phoneNumber").value("911"))
-                .andExpect(jsonPath("$.address").value("9310 Lasalle"));
-    }
 
     @Test
-    void createStudentSameUsernameTest() throws Exception{
-        /**
-         Student s = Student.builder().enabled(true)
-         .username("etudiant")
-         .role("student")
-         .password(new BCryptPasswordEncoder().encode("password"))
-         .firstName("Bob")
-         .lastName("Brutus")
-         .id(4L)
-         .studentId("1234")
-         .email("power@gmail.ca")
-         .phoneNumber("911")
-         .address("9310 Lasalle")
-         .build();
+    @WithMockUser("etudiant")
+    void getAllEmployers() throws Exception {
 
-        when(studentRepository.saveAndFlush(any())).thenReturn(s);
+        List<Student> studentList = new ArrayList<>();
 
-         Student s1 = Student.builder().enabled(true)
-         .username("etudiant")
-         .role("student")
-         .password(new BCryptPasswordEncoder().encode("password"))
-         .firstName("Bob")
-         .lastName("Brutus")
-         .id(5L)
-         .studentId("1234")
-         .email("power@gmail.ca")
-         .phoneNumber("911")
-         .address("9310 Lasalle")
-         .build();
+        for (int i = 0; i < 3; i++)
+            studentList.add(new Student());
 
-         when(studentRepository.saveAndFlush(any())).thenReturn(s1);
-
-         mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":5,\"username\":\"etudiant\",\"password\":\"password\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
-         .andExpect(status().isConflict());
-         **/
+        when(studentRepository.findAll()).thenReturn(studentList);
+        mvc.perform(get("/students"))
+                .andExpect(status().isOk());
     }
 
 
