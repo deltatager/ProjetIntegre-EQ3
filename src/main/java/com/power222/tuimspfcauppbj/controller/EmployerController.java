@@ -38,8 +38,10 @@ public class EmployerController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Employer> getEmployerById(@PathVariable long id) {
-        return repository.findById(id);
+    public ResponseEntity<Employer> getEmployerById(@PathVariable long id) {
+        return repository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
