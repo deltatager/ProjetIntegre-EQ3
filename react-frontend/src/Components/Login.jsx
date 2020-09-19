@@ -10,10 +10,13 @@ class Login extends Component {
     }
 
     componentDidMount = () => {
-
+     
     }
 
     onSubmit = (values) => {
+        console.log(values.username+ "aaaa " +values.password)
+         AuthenticationRegistrationService.logout()
+         AuthenticationRegistrationService.setupAxiosInterceptors(values.username,values.password)
         axios({
             method: "GET",
             url: "http://localhost:8080/auth/user",
@@ -22,13 +25,24 @@ class Login extends Component {
             }
         }).then((response) => {
             let user = response.data
-
+                
             AuthenticationRegistrationService.saveValueToSession("authenticatedUser", JSON.stringify(user))
 
             this.props.history.push("/welcome")
         }).catch((error) => {
             console.log(error)
         })
+
+
+        axios({
+            method: "GET",
+            url: "http://localhost:8080/auth/user"
+        }).then((response) => {
+            console.log(response)
+        }).catch((error) => {
+            console.log(error)
+        })
+       
     }
 
 
