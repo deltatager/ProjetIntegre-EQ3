@@ -9,6 +9,25 @@ class AuthenticationRegistrationService{
                }
            )
      }
+
+
+    isUserLoggedIn(){
+        return sessionStorage.getItem("authenticatedUser") != null  
+    }
+
+    getValueFromSession(key) {
+        return sessionStorage.getItem(key)
+    }
+
+    logout(){
+        sessionStorage.removeItem("authenticatedUser")
+    }
+
+    saveValueToSession(key, value) {
+        sessionStorage.setItem(key, value)
+    }
+
+
 }
 
 export default new AuthenticationRegistrationService()

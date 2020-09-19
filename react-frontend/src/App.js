@@ -5,6 +5,7 @@ import Navbar from './Components/Header/Navbar';
 import Footer from './Components/Footer/Footer';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import RegisteringManager from "./Components/RegisteringManager";
+import Welcome from "./Components/Welcome";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
               <Route exact path="/" component={RegisteringManager} />
               <Route path="/register" component={RegisteringManager} />
               <Route path="/login" component={Login} />
+              <Route path="/welcome" component={Welcome}></Route>
             </Switch>
           </Router>
         </div>

@@ -16,7 +16,6 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
         SpringApplication.run(TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPoweredByJavaApplication.class, args);
     }
 
-    @Profile("!test")
     @Component
     @Profile("!test")
     public static class BootstrapConfig implements CommandLineRunner {
