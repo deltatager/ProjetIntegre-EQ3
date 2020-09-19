@@ -90,7 +90,7 @@ class Login extends Component {
             <fieldset className="form-group">
                 <label>Username : </label>
                 <Field style={props.errors.username ? {border: "1px solid tomato", borderWidth: "thick"} : {}}
-                       className="form-control" type="text" name="username"/>
+                       className="form-control" type="text" name="username" id="username"/>
             </fieldset>
 
             <fieldset className="form-group">
