@@ -166,7 +166,7 @@ public class StudentControllerTests {
          .address("9310 Lasalle")
          .build();
 
-         studentRepository.saveAndFlush(s);
+        when(studentRepository.saveAndFlush(any())).thenReturn(s);
 
          Student s1 = Student.builder().enabled(true)
          .username("etudiant")
@@ -183,10 +183,9 @@ public class StudentControllerTests {
 
          when(studentRepository.saveAndFlush(any())).thenReturn(s1);
 
-         mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":5,\"username\":\"etudiant\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
+         mvc.perform(post("/students").contentType(MediaType.APPLICATION_JSON).content("{\"id\":5,\"username\":\"etudiant\",\"password\":\"password\",\"role\":\"student\",\"enabled\":true,\"firstName\":\"Bob\",\"lastName\":\"Brutus\",\"studentId\":\"1234\",\"email\":\"power@gmail.ca\",\"phoneNumber\":\"911\",\"address\":\"9310Lasalle\"}"))
          .andExpect(status().isConflict());
          **/
-
     }
 
 

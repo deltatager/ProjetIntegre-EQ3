@@ -41,8 +41,10 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable long id){
-        return repository.findById(id).get();
+    public ResponseEntity<Student> getStudentById(@PathVariable long id) {
+        return repository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
