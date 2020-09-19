@@ -31,8 +31,10 @@ class Login extends Component {
             headers: {
                 authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
             }
-        }).then(function (response) {
+        }).then((response) => {
             console.log(response);
+            // console.log(this.props);
+            this.props.history.push("/welcome/" + this.state.username);
         }).catch(function (error) {
             console.log(error);
         });

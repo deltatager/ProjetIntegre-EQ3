@@ -7,6 +7,7 @@ import Login from './Components/Login';
 import Navbar from './Components/Header/Navbar';
 import Footer from './Components/Footer/Footer';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import Welcome from './Components/Welcome';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
               <Route exact path="/" component={Register}></Route>
               <Route path="/register" component={Register}></Route>
               <Route path="/login" component={Login}></Route>
+              <Route path="/welcome/:name" component={Welcome}></Route>
             </Switch>
           </Router>
         </div>
