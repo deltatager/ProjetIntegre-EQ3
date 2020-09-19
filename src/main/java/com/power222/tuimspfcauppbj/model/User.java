@@ -1,8 +1,6 @@
 package com.power222.tuimspfcauppbj.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -22,7 +20,7 @@ public class User {
     private Long id;
 
     private String username;
-    @JsonIgnore
+
     private String password;
     private String role;
     private boolean enabled;

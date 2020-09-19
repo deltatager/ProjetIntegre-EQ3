@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,7 +43,7 @@ public class EmployerControllerTests {
 
     @Test
     @WithMockUser("employer")
-    void getEmployer() throws Exception {
+    void getEmployerTest() throws Exception {
         Employer emp = Employer.builder()
                 .enabled(true)
                 .id(1L)
@@ -71,12 +72,13 @@ public class EmployerControllerTests {
     }
 
     @Test
-    void createEmployer() throws Exception {
+    void createEmployerTest() throws Exception {
         Employer emp = Employer.builder()
                 .enabled(true)
                 .id(1L)
                 .username("employer")
                 .role("employer")
+                .password(new BCryptPasswordEncoder().encode("password"))
                 .companyName("AL")
                 .contactName("emp1")
                 .phoneNumber("0123456789")
@@ -86,7 +88,7 @@ public class EmployerControllerTests {
 
         when(empRepo.saveAndFlush(any())).thenReturn(emp);
 
-        mvc.perform(post("/employers").contentType(MediaType.APPLICATION_JSON).content("{\"id\":1,\"username\":\"employer\",\"role\":\"employer\",\"enabled\":true,\"companyName\":\"AL\",\"contactName\":\"emp1\",\"phoneNumber\":\"0123456789\",\"address\":\"123claurendeau\",\"email\":\"123@claurendeau.qc.ca\"}"))
+        mvc.perform(post("/employers").contentType(MediaType.APPLICATION_JSON).content("{\"id\":1,\"username\":\"employer\",\"password\":\"password\",\"role\":\"employer\",\"enabled\":true,\"companyName\":\"AL\",\"contactName\":\"emp1\",\"phoneNumber\":\"0123456789\",\"address\":\"123claurendeau\",\"email\":\"123@claurendeau.qc.ca\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.enabled").value("true"))
