@@ -1,6 +1,9 @@
 package com.power222.tuimspfcauppbj.controllers;
 
+import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.model.Student;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,11 +20,15 @@ public class FullContextStudentControllerTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Test
-    void udpateStudentTest() {
 
+    private Student oldStudent;
 
-        Student s = Student.builder()
+    @Autowired
+    private StudentRepository repository;
+
+    @BeforeEach
+    private void beforeEach() {
+        oldStudent = Student.builder()
                 .username("etudiant")
                 .password("password")
                 .firstName("Bob")
@@ -31,30 +38,41 @@ public class FullContextStudentControllerTests {
                 .phoneNumber("911")
                 .address("9310 Lasalle")
                 .build();
+    }
+
+    @AfterEach
+    private void afterEach() {
+        repository.deleteAll();
+    }
+
+
+    @Test
+    void udpateStudentTest() {
+
 
         ResponseEntity<Student> response = restTemplate
                 .withBasicAuth("admin", "password")
-                .postForEntity("/students", s, Student.class);
+                .postForEntity("/students", oldStudent, Student.class);
 
-        s.setId(response.getBody().getId());
-        s.setRole("student");
-        s.setEnabled(true);
+        oldStudent.setId(response.getBody().getId());
+        oldStudent.setRole("student");
+        oldStudent.setEnabled(true);
 
         //le hash bcrypt change chaque foit
         response.getBody().setPassword("password");
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        assertThat(response.getBody(), is(equalTo(s)));
+        assertThat(response.getBody(), is(equalTo(oldStudent)));
 
-        s.setPhoneNumber("9");
+        oldStudent.setPhoneNumber("9");
 
         restTemplate.withBasicAuth("admin", "password")
-                .put("/students/" + s.getId(), s);
+                .put("/students/" + oldStudent.getId(), oldStudent);
 
         response = restTemplate.withBasicAuth("admin", "password")
-                .getForEntity("/students/" + s.getId(), Student.class);
-        assertThat(response.getBody(), is(equalTo(s)));
+                .getForEntity("/students/" + oldStudent.getId(), Student.class);
+        assertThat(response.getBody(), is(equalTo(oldStudent)));
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
 
     }
@@ -62,16 +80,7 @@ public class FullContextStudentControllerTests {
 
     @Test
     void deleteStudentTest() {
-        Student oldStudent = Student.builder()
-                .username("etudiant")
-                .password("password")
-                .firstName("Bob")
-                .lastName("Brutus")
-                .studentId("1234")
-                .email("power@gmail.ca")
-                .phoneNumber("911")
-                .address("9310 Lasalle")
-                .build();
+
 
         ResponseEntity<Student> response = restTemplate
                 .withBasicAuth("admin", "password")
@@ -100,16 +109,7 @@ public class FullContextStudentControllerTests {
 
     @Test
     void verifierUsernameUniqueTest() {
-        Student oldStudent = Student.builder()
-                .username("etudiant")
-                .password("password")
-                .firstName("Bob")
-                .lastName("Brutus")
-                .studentId("1234")
-                .email("power@gmail.ca")
-                .phoneNumber("911")
-                .address("9310 Lasalle")
-                .build();
+
 
         ResponseEntity<Student> response = restTemplate
                 .withBasicAuth("admin", "password")
