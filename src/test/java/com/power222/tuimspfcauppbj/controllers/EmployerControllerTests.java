@@ -6,16 +6,18 @@ import com.power222.tuimspfcauppbj.dao.EmployerRepository;
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Employer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,13 +43,15 @@ public class EmployerControllerTests {
     @Autowired
     private MockMvc mvc;
 
-    @Test
-    @WithMockUser("employer")
-    void getEmployerTest() throws Exception {
-        Employer emp = Employer.builder()
+    private Employer emp;
+
+    @BeforeEach
+    private void beforeEach() {
+        emp = Employer.builder()
                 .enabled(true)
                 .id(1L)
                 .username("employer")
+                .password("password")
                 .role("employer")
                 .companyName("AL")
                 .contactName("emp1")
@@ -55,6 +59,11 @@ public class EmployerControllerTests {
                 .address("123claurendeau")
                 .email("123@claurendeau.qc.ca")
                 .build();
+    }
+
+    @Test
+    @WithMockUser("employer")
+    void getEmployerTest() throws Exception {
 
         when(empRepo.findById(1L)).thenReturn(Optional.ofNullable(emp));
 
@@ -73,18 +82,6 @@ public class EmployerControllerTests {
 
     @Test
     void createEmployerTest() throws Exception {
-        Employer emp = Employer.builder()
-                .enabled(true)
-                .id(1L)
-                .username("employer")
-                .role("employer")
-                .password(new BCryptPasswordEncoder().encode("password"))
-                .companyName("AL")
-                .contactName("emp1")
-                .phoneNumber("0123456789")
-                .address("123claurendeau")
-                .email("123@claurendeau.qc.ca")
-                .build();
 
         when(empRepo.saveAndFlush(any())).thenReturn(emp);
 
@@ -99,6 +96,18 @@ public class EmployerControllerTests {
                 .andExpect(jsonPath("$.phoneNumber").value("0123456789"))
                 .andExpect(jsonPath("$.address").value("123claurendeau"))
                 .andExpect(jsonPath("$.email").value("123@claurendeau.qc.ca"));
+    }
 
+    @Test
+    @WithMockUser("employer")
+    void getAllEmployers() throws Exception {
+        List<Employer> listEmp = new ArrayList<>();
+        for (int i = 0; i < 3; i++)
+            listEmp.add(new Employer());
+
+        when(empRepo.findAll()).thenReturn(listEmp);
+
+        mvc.perform(get("/employers"))
+                .andExpect(status().isOk());
     }
 }

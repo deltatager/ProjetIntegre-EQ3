@@ -1,6 +1,8 @@
 package com.power222.tuimspfcauppbj.controllers;
 
+import com.power222.tuimspfcauppbj.dao.EmployerRepository;
 import com.power222.tuimspfcauppbj.model.Employer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,10 @@ public class FullContextEmployerControllerTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private EmployerRepository employerRepo;
+
     private Employer oldEmp;
 
     @BeforeEach
@@ -30,6 +36,11 @@ public class FullContextEmployerControllerTests {
                 .address("123claurendeau")
                 .email("123@claurendeau.qc.ca")
                 .build();
+    }
+
+    @AfterEach
+    private void afterEach() {
+        employerRepo.deleteAll();
     }
 
     @Test
@@ -74,6 +85,19 @@ public class FullContextEmployerControllerTests {
                 .getForEntity("/employers/" + oldEmp.getId(), Employer.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
+    }
+
+    @Test
+    void verifierUsernameUnique() {
+
+        ResponseEntity<Employer> response = restTemplate.withBasicAuth("admin", "password")
+                .postForEntity("/employers", oldEmp, Employer.class);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
+
+        response = restTemplate.withBasicAuth("admin", "password")
+                .postForEntity("/employers", oldEmp, Employer.class);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CONFLICT)));
+
     }
 
     private void updateOldEmp(ResponseEntity<Employer> response) {
