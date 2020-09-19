@@ -1,5 +1,6 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import React,{Component} from 'react';
+import AuthenticationRegistrationService from '../js/AuthenticationRegistrationService';
 const axios = require("axios");
 
 class Login extends Component {
@@ -9,6 +10,7 @@ class Login extends Component {
         this.state = {
             username: "",
             password: "",
+            user: {}
         }
     }
 
@@ -22,22 +24,49 @@ class Login extends Component {
             password : values.password
         });
         
-        console.log(this.state.username + ":" + this.state.password);
+        console.log(values.username + ":" + values.password);
         console.log(window.btoa(this.state.username + ":" + this.state.password));
 
         axios({
             method: "GET",
-            url: "http://localhost:8080/auth/basic",
+            url: "http://localhost:8080/auth/user",
             headers: {
-                authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
+                authorization: "Basic " + window.btoa(values.username + ":" + values.password)
             }
         }).then((response) => {
-            console.log(response);
-            // console.log(this.props);
-            this.props.history.push("/welcome/" + this.state.username);
-        }).catch(function (error) {
-            console.log(error);
-        });
+            // console.log(response.data)
+
+            this.setState({
+                user : response.data
+            })
+
+            console.log(this.state.user)
+
+            AuthenticationRegistrationService.saveValueToSession("authenticatedUser", JSON.stringify(this.state.user))
+            console.log(JSON.parse(AuthenticationRegistrationService.getValueFromSession("authenticatedUser")).username)
+            this.props.history.push("/welcome")
+        }).catch((error) => {
+            console.log(error)
+        })
+
+        // axios({
+        //     method: "GET",
+        //     url: "http://localhost:8080/auth/basic",
+        //     headers: {
+        //         authorization: "Basic " + window.btoa(this.state.username + ":" + this.state.password)
+        //     }
+        // }).then((response) => {
+        //     console.log(response);
+
+        //     // AuthenticationRegistrationService.setupAxiosInterceptors(this.state.username, this.state.password)
+
+        //     // console.log(this.props);
+
+        //     // AuthenticationRegistrationService.saveValueToSession("authenticatedUser", this.state.user)
+        //     // this.props.history.push("/welcome")
+        // }).catch(function (error) {
+        //     console.log(error);
+        // });
     }
 
 

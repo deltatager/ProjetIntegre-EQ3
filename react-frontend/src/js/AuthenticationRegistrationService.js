@@ -11,23 +11,21 @@ class AuthenticationRegistrationService{
      }
 
 
-     isUserLoggedIn(){
-        return sessionStorage.getItem("authenticaredUser") != null  
+    isUserLoggedIn(){
+        return sessionStorage.getItem("authenticatedUser") != null  
     }
 
-    getLoggedInUser(){
-        return sessionStorage.getItem("authenticaredUser")
+    getValueFromSession(key) {
+        return sessionStorage.getItem(key)
     }
 
     logout(){
-        sessionStorage.removeItem("authenticaredUser")
+        sessionStorage.removeItem("authenticatedUser")
     }
 
-    registerSuccesfulLogin = (username,password) =>{
-        sessionStorage.setItem("authenticaredUser",username)
-        this.setUpAxiosInterceptors('Basic ' + window.btoa(username + ":" + password))
+    saveValueToSession(key, value) {
+        sessionStorage.setItem(key, value)
     }
-
 
 
 }
