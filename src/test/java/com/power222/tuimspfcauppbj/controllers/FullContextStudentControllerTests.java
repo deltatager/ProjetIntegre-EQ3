@@ -10,26 +10,28 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
+@ActiveProfiles("noSecurityTests")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FullContextStudentControllerTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-
-    private Student oldStudent;
-
     @Autowired
     private StudentRepository repository;
 
+    private Student student;
+
     @BeforeEach
     private void beforeEach() {
-        oldStudent = Student.builder()
-                .username("etudiant")
+        student = Student.builder()
+                .username("etudiant2")
                 .password("password")
                 .firstName("Bob")
                 .lastName("Brutus")
@@ -45,82 +47,61 @@ public class FullContextStudentControllerTests {
         repository.deleteAll();
     }
 
-
     @Test
     void udpateStudentTest() {
+        ResponseEntity<Student> response = restTemplate.postForEntity("/students", student, Student.class);
 
-
-        ResponseEntity<Student> response = restTemplate
-                .withBasicAuth("admin", "password")
-                .postForEntity("/students", oldStudent, Student.class);
-
-        oldStudent.setId(response.getBody().getId());
-        oldStudent.setRole("student");
-        oldStudent.setEnabled(true);
-
-        //le hash bcrypt change chaque foit
-        response.getBody().setPassword("password");
+        updateExpectedStudent(response);
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
-        assertThat(response.getBody(), is(equalTo(oldStudent)));
+        assertThat(response.getBody(), is(equalTo(student)));
 
-        oldStudent.setPhoneNumber("9");
+        student.setPhoneNumber("9");
 
-        restTemplate.withBasicAuth("admin", "password")
-                .put("/students/" + oldStudent.getId(), oldStudent);
+        restTemplate.put("/students/" + student.getId(), student);
 
-        response = restTemplate.withBasicAuth("admin", "password")
-                .getForEntity("/students/" + oldStudent.getId(), Student.class);
-        assertThat(response.getBody(), is(equalTo(oldStudent)));
+        response = restTemplate.getForEntity("/students/" + student.getId(), Student.class);
+        assertThat(response.getBody(), is(equalTo(student)));
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
-
     }
-
 
     @Test
     void deleteStudentTest() {
+        ResponseEntity<Student> response = restTemplate.postForEntity("/students", student, Student.class);
 
-
-        ResponseEntity<Student> response = restTemplate
-                .withBasicAuth("admin", "password")
-                .postForEntity("/students", oldStudent, Student.class);
-
-        oldStudent.setId(response.getBody().getId());
-        oldStudent.setRole("student");
-        oldStudent.setEnabled(true);
-
-        //le hash bcrypt change chaque foit
-        response.getBody().setPassword("password");
+        updateExpectedStudent(response);
 
         assertThat(response, is(notNullValue()));
-        assertThat(response.getBody(), is(equalTo(oldStudent)));
         assertThat(response.getStatusCode(), is(HttpStatus.CREATED));
+        assertThat(response.getBody(), is(equalTo(student)));
 
-        restTemplate.withBasicAuth("admin", "password")
-                .delete("/students/" + oldStudent.getId());
+        restTemplate.delete("/students/" + student.getId());
 
-
-        response = restTemplate.withBasicAuth("admin", "password")
-                .getForEntity("/students/" + oldStudent.getId(), Student.class);
+        response = restTemplate.getForEntity("/students/" + student.getId(), Student.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.NOT_FOUND)));
     }
 
     @Test
     void verifierUsernameUniqueTest() {
-
-
         ResponseEntity<Student> response = restTemplate
                 .withBasicAuth("admin", "password")
-                .postForEntity("/students", oldStudent, Student.class);
+                .postForEntity("/students", student, Student.class);
 
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
 
-        response = restTemplate
-                .withBasicAuth("admin", "password")
-                .postForEntity("/students", oldStudent, Student.class);
+        response = restTemplate.postForEntity("/students", student, Student.class);
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CONFLICT)));
     }
 
+    private void updateExpectedStudent(ResponseEntity<Student> response) {
+        if (!response.hasBody())
+            fail("Response body should no be empty");
+
+        //noinspection ConstantConditions
+        student.setId(response.getBody().getId());
+        student.setRole("student");
+        student.setEnabled(true);
+    }
 }

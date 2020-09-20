@@ -1,6 +1,5 @@
 package com.power222.tuimspfcauppbj.controller;
 
-
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/students")
@@ -28,7 +26,6 @@ public class StudentController {
     public List<Student> getAllStudents() {
         return repository.findAll();
     }
-
 
     @PostMapping
     public ResponseEntity<Student> createStudent(@RequestBody Student newStudent) {
@@ -55,7 +52,6 @@ public class StudentController {
         });
         return ResponseEntity.of(optStudent);
     }
-
 
     @DeleteMapping("/{id}")
     @Transactional
