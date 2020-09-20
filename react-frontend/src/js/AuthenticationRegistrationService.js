@@ -1,19 +1,18 @@
 import axios from 'axios'
+
 class AuthenticationRegistrationService{
     constructor(){
-        this.id = 0;
+        this.interceptorId = 0;
     }
      setupAxiosInterceptors(username, password){
 
         let basicAuthHeader = 'Basic ' + window.btoa(username + ":" + password)
-        this.id = axios.interceptors.request.use(
-         
-            (config) => {
-                config.headers.authorization = basicAuthHeader
-                return config
-            }
-        
-        )
+         this.interceptorId = axios.interceptors.request.use(
+             (config) => {
+                 config.headers.authorization = basicAuthHeader
+                 return config
+             }
+         )
      }
 
 
@@ -27,7 +26,7 @@ class AuthenticationRegistrationService{
 
     logout(){
         sessionStorage.removeItem("authenticatedUser")
-        axios.interceptors.request.eject(this.id)
+        axios.interceptors.request.eject(this.interceptorId)
     }
 
     saveValueToSession(key, value) {
