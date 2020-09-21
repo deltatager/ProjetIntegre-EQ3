@@ -117,7 +117,7 @@ export default function Login(props) {
                             AuthenticationRegistrationService.setupAxiosInterceptors(values.username, values.password)
                             return axios({
                                 method: "GET",
-                                url: "http://localhost:8080/auth/user",
+                                url: "http://localhost/auth/user",
                                 headers: {
                                     authorization: "Basic " + window.btoa(values.username + ":" + values.password)
                                 }
