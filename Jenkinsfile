@@ -23,14 +23,16 @@ pipeline {
             }
         }
         stage('Report to JIRA') {
-            script {
-                        def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
-                        def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.currentResult}" ]
-                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE')
-                        {
-                            jiraAddComment idOrKey: getCommit(commit), input: comment, auditLog: false
-                        }
+            steps {
+                script {
+                    def commit = sh(returnStdout: true, script: 'git log -1 --pretty=%B | cat')
+                    def comment = [ body: "Build [$BUILD_TAG|$BUILD_URL] status is ${currentBuild.currentResult}" ]
+                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE')
+                    {
+                        jiraAddComment idOrKey: getCommit(commit), input: comment, auditLog: false
                     }
+                }
+            }
         }
     }
 }
