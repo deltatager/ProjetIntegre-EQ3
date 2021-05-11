@@ -17,19 +17,11 @@ public enum ContractSignatureState {
                     return WAITING_FOR_STUDENT_SIGNATURE;
                 else
                     return REJECTED_BY_EMPLOYER;
-            default:
-                return signatureState;
-        }
-    }
-
-    public static UserTypes getSignerFromState(ContractSignatureState state) {
-        switch (state) {
-            case WAITING_FOR_EMPLOYER_SIGNATURE:
-                return UserTypes.EMPLOYER;
             case WAITING_FOR_STUDENT_SIGNATURE:
-                return UserTypes.STUDENT;
+                return WAITING_FOR_ADMIN_SIGNATURE;
+            case WAITING_FOR_ADMIN_SIGNATURE:
             default:
-                return UserTypes.ADMIN;
+                return SIGNED;
         }
     }
 }

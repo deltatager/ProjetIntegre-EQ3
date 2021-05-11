@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.power222.tuimspfcauppbj.config.TestsWithoutSecurityConfig;
 import com.power222.tuimspfcauppbj.model.Employer;
 import com.power222.tuimspfcauppbj.model.InternshipOffer;
+import com.power222.tuimspfcauppbj.model.InternshipOffer.InternshipOfferDetails;
 import com.power222.tuimspfcauppbj.model.Student;
 import com.power222.tuimspfcauppbj.service.InternshipOfferService;
 import com.power222.tuimspfcauppbj.util.ReviewState;
@@ -17,8 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
+@SuppressWarnings("MagicNumber")
 @ActiveProfiles({"noSecurityTests", "noBootstrappingTests"})
 @Import(TestsWithoutSecurityConfig.class)
 @WebMvcTest(InternshipOfferController.class)
@@ -48,35 +49,33 @@ public class InternshipOfferControllerTests {
     private Student expectedStudent;
 
     @BeforeEach
-    void beforeEach() throws ParseException {
+    void beforeEach() {
 
         expectedEmployer = Employer.builder()
-                .username("employeur")
-                .role("employer")
+                .email("employeur@gmail.com")
                 .build();
 
         expectedStudent = Student.builder()
                 .id(1L)
-                .username("student")
-                .role("student")
                 .firstName("Simon")
                 .lastName("Longpré")
                 .studentId("1386195")
-                .email("simon@cal.qc.ca")
+                .email("student@cal.qc.ca")
                 .phoneNumber("5144816959")
                 .address("6600 St-Jacques Ouest")
                 .build();
 
         expectedOffer = InternshipOffer.builder()
                 .id(1)
-                .creationDate(new SimpleDateFormat("dd/MM/yyyy").parse("1/08/2020"))
-                .limitDateToApply(new SimpleDateFormat("dd/MM/yyyy").parse("31/08/2020"))
-                .description("desc")
-                .file("alalalala")
-                .file("alalalala")
-                .salary(15.87)
-                .reviewState(ReviewState.APPROVED)
                 .title("Titre")
+                .details(InternshipOfferDetails.builder()
+                        .creationDate(LocalDate.parse("2020-08-01"))
+                        .limitDateToApply(LocalDate.parse("2020-08-31"))
+                        .description("desc")
+                        .salary(15.87)
+                        .build())
+                .reviewState(ReviewState.APPROVED)
+                .file("alalalala")
                 .employer(expectedEmployer)
                 .allowedStudents(Collections.singletonList(expectedStudent))
                 .applications(Collections.emptyList())
@@ -84,13 +83,15 @@ public class InternshipOfferControllerTests {
 
         expectedOffer2 = InternshipOffer.builder()
                 .id(1)
-                .creationDate(new SimpleDateFormat("dd/MM/yyyy").parse("1/08/2020"))
-                .limitDateToApply(new SimpleDateFormat("dd/MM/yyyy").parse("31/08/2020"))
-                .description("desc")
-                .file("alalalala")
-                .salary(15.87)
-                .reviewState(ReviewState.APPROVED)
                 .title("Titre")
+                .details(InternshipOfferDetails.builder()
+                        .creationDate(LocalDate.parse("2020-08-01"))
+                        .limitDateToApply(LocalDate.parse("2020-08-31"))
+                        .description("desc")
+                        .salary(15.87)
+                        .build())
+                .reviewState(ReviewState.APPROVED)
+                .file("alalalala")
                 .employer(expectedEmployer)
                 .allowedStudents(Collections.singletonList(expectedStudent))
                 .applications(Collections.emptyList())
@@ -147,15 +148,15 @@ public class InternshipOfferControllerTests {
 
     @Test
     void getOfferByEmployerId() throws Exception {
-        when(svc.getInternshipOffersOfEmployer(expectedEmployer.getUsername())).thenReturn(Arrays.asList(expectedOffer, expectedOffer2));
+        when(svc.getInternshipOffersOfEmployer(expectedEmployer.getEmail())).thenReturn(Arrays.asList(expectedOffer, expectedOffer2));
 
-        mvc.perform(get("/api/offers/employer/" + expectedEmployer.getUsername()))
+        mvc.perform(get("/api/offers/employer/" + expectedEmployer.getEmail()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void createOffer() throws Exception {
-        when(svc.uploadInternshipOffer(expectedOffer)).thenReturn(Optional.of(expectedOffer));
+        when(svc.createInternshipOffer(expectedOffer)).thenReturn(Optional.of(expectedOffer));
 
         mvc.perform(post("/api/offers").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(expectedOffer)))
                 .andExpect(status().isCreated());
@@ -163,7 +164,7 @@ public class InternshipOfferControllerTests {
 
     @Test
     void createInvalidOffer() throws Exception {
-        when(svc.uploadInternshipOffer(expectedOffer)).thenReturn(Optional.empty());
+        when(svc.createInternshipOffer(expectedOffer)).thenReturn(Optional.empty());
 
         mvc.perform(post("/api/offers").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(expectedOffer)))
                 .andExpect(status().isBadRequest());
@@ -172,8 +173,6 @@ public class InternshipOfferControllerTests {
     @Test
     void updateOffer() throws Exception {
         when(svc.updateInternshipOffer(expectedOffer.getId(), expectedOffer)).thenReturn(Optional.of(expectedOffer));
-        System.err.println(expectedOffer);
-        System.err.println(mapper.readValue(mapper.writeValueAsString(expectedOffer), InternshipOffer.class));
 
         mvc.perform(put("/api/offers/" + expectedOffer.getId())
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(expectedOffer)))
@@ -190,7 +189,7 @@ public class InternshipOfferControllerTests {
 
     @Test
     void addStudentToOffer() throws Exception {
-        when(svc.addOrRemoveStudentFromOffer(expectedOffer.getId(), expectedStudent.getId())).thenReturn(Optional.of(expectedOffer));
+        when(svc.switchOfferVisibilityForStudent(expectedOffer.getId(), expectedStudent.getId())).thenReturn(Optional.of(expectedOffer));
 
         mvc.perform(put("/api/offers/" + expectedOffer.getId() + "/addRemoveStudent/" + expectedStudent.getId()).
                 contentType(MediaType.APPLICATION_JSON).content("{}"))
@@ -199,7 +198,7 @@ public class InternshipOfferControllerTests {
 
     @Test
     void addStudentToOfferWithError() throws Exception {
-        when(svc.addOrRemoveStudentFromOffer(expectedOffer.getId(), expectedStudent.getId())).thenReturn(Optional.empty());
+        when(svc.switchOfferVisibilityForStudent(expectedOffer.getId(), expectedStudent.getId())).thenReturn(Optional.empty());
 
         mvc.perform(put("/api/offers/" + expectedOffer.getId() + "/addRemoveStudent/" + expectedStudent.getId()).
                 contentType(MediaType.APPLICATION_JSON).content("{}"))

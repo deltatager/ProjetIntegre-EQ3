@@ -1,32 +1,47 @@
+import {Typography, useTheme} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import React, {useEffect, useState} from "react";
-import useStyles from "../Utils/useStyles";
-import {useApi} from "../Utils/Hooks";
-import {Typography} from "@material-ui/core";
-import PdfSelectionViewer from "../Utils/PdfSelectionViewer";
+import {useHistory} from "react-router-dom";
+import {useApi} from "../../Services/Hooks";
+import ApprovalButtons from "../Utils/ApprovalButtons";
+import PdfSelectionViewer from "../Utils/PDF/PdfSelectionViewer";
+import useStyles from "../Utils/Style/useStyles";
 
-export default function ContractList() {
-    const classes = useStyles();
-    const api = useApi();
-    const [contracts, setContracts] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
+export default function ContractList({count}) {
+    const classes = useStyles()
+    const theme = useTheme()
+    const api = useApi()
+    const history = useHistory()
+    const [contracts, setContracts] = useState([])
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [disabledDelContractBtn, setDisabledDelContractBtn] = useState(false)
 
     useEffect(() => {
         api.get("/contract")
             .then(r => setContracts(r ? r.data : []))
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-    function sendDecision(index, contractState) {
-        const nextState = [...contracts];
-        const contract = nextState[index];
-        contract.signatureState = contractState;
-        return api.put("/contract/" + contract.id, contract)
-            .then(result => {
-                setContracts(nextState);
+    useEffect(() => {
+        if (count)
+            count(contracts.length)
+    })
+
+    function sendDecision(index, isApproved) {
+        const nextState = [...contracts]
+        const signDto = {}
+        signDto.contractId = nextState[index].id
+        signDto.isApproved = isApproved
+
+        return api.put("/contractGeneration/sign", signDto)
+            .then(r => {
+                nextState.splice(index, 1, r.data)
+                setContracts(nextState)
             })
     }
 
     function deleteContract(index) {
-        const nextState = [...contracts];
+        const nextState = [...contracts]
         return api.delete("/contract/" + nextState[index].id)
             .then(() => {
                 nextState.splice(index, 1)
@@ -35,79 +50,102 @@ export default function ContractList() {
     }
 
     function showContractState(index) {
-        const nextState = [...contracts];
-        const contractState = nextState[index].signatureState;
+        const nextState = [...contracts]
+        const contractState = nextState[index].signatureState
 
         switch (contractState) {
             case "WAITING_FOR_EMPLOYER_SIGNATURE" :
-                return <Typography variant={"body1"} style={{color: "blue"}}>
+                return <Typography variant={"body1"} style={{color: theme.palette.info.main}}>
                     En attente de la signature de l'employeur
                 </Typography>
             case "REJECTED_BY_EMPLOYER" :
-                return <Typography variant={"body1"} style={{color: "red"}}>
+                return <Typography variant={"body1"} style={{color: theme.palette.error.main}}>
                     L'employeur a rejeté le contrat :
                     {nextState[index].reasonForRejection}
                 </Typography>
             case "WAITING_FOR_STUDENT_SIGNATURE" :
-                return <Typography variant={"body1"} style={{color: "blue"}}>
+                return <Typography variant={"body1"} style={{color: theme.palette.info.main}}>
                     En attente de la signature de l'étudiant
                     {nextState[index].reasonForRejection}
                 </Typography>
             case "SIGNED":
-                return <Typography variant={"body1"} style={{color: "green"}}>
+                return <Typography variant={"body1"} style={{color: theme.palette.success.main}}>
                     Contrat signé
                 </Typography>
             default:
-                return '';
+                return ""
         }
     }
 
-    return (
-        <div style={{height: "100%"}}>
-            <PdfSelectionViewer
-                documents={contracts ? contracts.map(c => c.file ? c.file : "") : []}
-                title={"Contrats"}>
-                {(i, setCurrent) => (
-                    <div key={i}>
-                        <di className={classes.buttonDiv}>
-                            {contracts[i].signatureState !== "WAITING_FOR_STUDENT_SIGNATURE" &&
-                            <button
-                                type={"button"}
-                                className={classes.linkButton}
-                                onClick={() => deleteContract(i)}>
-                                <i className="fa fa-trash" style={{color: "red"}}/>
-                            </button>
-                            }
-                        </di>
-                        < button
-                            type={"button"}
-                            className={[classes.linkButton, i === currentIndex ? classes.fileButton : null].join(' ')}
+    function showDeleteContractButtonCondition(i) {
+        return contracts[i].signatureState === "WAITING_FOR_EMPLOYER_SIGNATURE" || contracts[i].signatureState === "REJECTED_BY_EMPLOYER"
+    }
+
+    function showEvaluationButtonCondition(i) {
+        return contracts[i].signatureState === "SIGNED" && contracts[i].businessEvaluation === null
+    }
+
+    return <div style={{height: "100%"}}>
+        <PdfSelectionViewer
+            documents={contracts ? contracts.map(c => c.file ? c.file : "") : []}
+            title={"Contrats en attente"}>
+            {(i, setCurrent) =>
+                <div key={i}>
+                    <Button
+                        variant={currentIndex === i ? "contained" : "outlined"}
+                        color={"primary"}
+                        size={"large"}
+                        onClick={() => {
+                            setCurrent(i)
+                            setCurrentIndex(i)
+                        }}
+                    >
+                        <Typography variant={"button"}>
+                            {contracts[i].studentApplication.student.firstName} {contracts[i].studentApplication.student.lastName}
+                            &ensp;&mdash;&ensp;{contracts[i].studentApplication.offer.employer.companyName}
+                        </Typography>
+                    </Button>
+                    {contracts[i].signatureState === "PENDING_FOR_ADMIN_REVIEW" &&
+                    <ApprovalButtons
+                        onApprove={() => sendDecision(i, true)}
+                        onDeny={() => deleteContract(i)}
+                        approveLabel={"Approuver le contrat"}
+                        denyLabel={"Supprimer le contrat"}
+                    />
+                    }
+                    {showContractState(i)}
+                    {currentIndex === i && showDeleteContractButtonCondition(i) && <>
+                            &ensp;{disabledDelContractBtn && <CircularProgress size={18}/>}
+                        <Button
+                            variant={"contained"}
+                            color={"secondary"}
+                            size={"small"}
+                            disabled={disabledDelContractBtn}
                             onClick={() => {
-                                setCurrent(i);
-                                setCurrentIndex(i);
-                            }}
-                        >
-                            <Typography color={"textPrimary"} variant={"body1"}>
-                                {contracts[i].studentApplication.student.firstName} {contracts[i].studentApplication.student.lastName}
-                                &ensp;&mdash;&ensp;{contracts[i].studentApplication.offer.employer.companyName}
-                            </Typography>
-                            <Typography color={"textPrimary"} variant={"body2"}>
-                                Nom du gestionnaire de stage : {contracts[i].adminName}
-                            </Typography>
-                            {contracts[i].signatureState === "PENDING_FOR_ADMIN_REVIEW" &&
-                            <button
-                                type={"button"}
-                                className={[classes.approuvalButton].join(' ')}
-                                onClick={() => sendDecision(i, "WAITING_FOR_EMPLOYER_SIGNATURE")}>
-                                Approuver le contrat
-                            </button>
-                            }
-                            {showContractState(i)}
-                            <hr className={classes.hrStyle}/>
-                        </button>
-                    </div>
-                )}
-            </PdfSelectionViewer>
-        </div>
-    )
+                                setDisabledDelContractBtn(true)
+                                deleteContract(i)
+                            }}>
+                            <i className="fa fa-trash"/>&ensp;Supprimer
+                        </Button>
+                        <Typography variant={"body2"}>
+                            Nom du gestionnaire de stage : {contracts[i].admin.name}
+                        </Typography>
+                        </>
+                    }
+                    {showEvaluationButtonCondition(i) &&
+                    <Button
+                        variant={"contained"}
+                        color={"primary"}
+                        size="small"
+                        onClick={() => {
+                            history.push("/dashboard/businessEvaluation", {...contracts[i]})
+                        }}
+                    >
+                        <i className="fa fa-drivers-license-o"/>&ensp;Évaluer l'entreprise
+                    </Button>
+                    }
+                    <hr className={classes.hrStyle}/>
+                </div>}
+        </PdfSelectionViewer>
+    </div>
 }

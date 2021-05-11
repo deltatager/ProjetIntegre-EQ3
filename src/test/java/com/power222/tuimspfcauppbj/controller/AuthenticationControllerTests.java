@@ -1,6 +1,7 @@
 package com.power222.tuimspfcauppbj.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.power222.tuimspfcauppbj.model.Student;
 import com.power222.tuimspfcauppbj.model.User;
 import com.power222.tuimspfcauppbj.service.AuthenticationService;
 import com.power222.tuimspfcauppbj.util.PasswordDTO;
@@ -52,11 +53,10 @@ public class AuthenticationControllerTests {
     }
 
     @Test
-    @WithMockUser("etudiant")
+    @WithMockUser("etudiant@gmail.com")
     void getUserInfos() throws Exception {
-        User u = User.builder()
-                .username("etudiant")
-                .role("student")
+        User u = Student.builder()
+                .email("etudiant@gmail.com")
                 .password(new BCryptPasswordEncoder().encode("password"))
                 .build();
 
@@ -65,8 +65,7 @@ public class AuthenticationControllerTests {
         mvc.perform(get("/api/auth/user").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.username").value("etudiant"))
-                .andExpect(jsonPath("$.role").value("student"));
+                .andExpect(jsonPath("$.email").value("etudiant@gmail.com"));
     }
 
     @Test

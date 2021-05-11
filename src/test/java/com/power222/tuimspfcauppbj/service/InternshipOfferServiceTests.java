@@ -4,6 +4,7 @@ import com.power222.tuimspfcauppbj.dao.InternshipOfferRepository;
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.model.Employer;
 import com.power222.tuimspfcauppbj.model.InternshipOffer;
+import com.power222.tuimspfcauppbj.model.InternshipOffer.InternshipOfferDetails;
 import com.power222.tuimspfcauppbj.model.Student;
 import com.power222.tuimspfcauppbj.util.ReviewState;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,18 +14,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@SuppressWarnings("MagicNumber")
 @ExtendWith(MockitoExtension.class)
 class InternshipOfferServiceTests {
     @Mock
@@ -36,75 +35,73 @@ class InternshipOfferServiceTests {
     @Mock
     private AuthenticationService authenticationService;
 
+    @Mock
+    @SuppressWarnings("unused") //Required dependency of InternshipOfferService
+    private NotificationService notificationService;
+
     @InjectMocks
     private InternshipOfferService service;
+
     private InternshipOffer expectedOffer;
     private InternshipOffer expectedOffer2;
-    private List<InternshipOffer> expectedOffers;
-    private List<InternshipOffer> expectedOffersOfEmployer;
     private Employer expectedEmployer;
     private Student expectedStudent;
 
     @BeforeEach
     void setUp() {
-        Employer employer = Employer.builder().username("mark").email("a@gmail.com").build();
+        Employer employer = Employer.builder().email("a@gmail.com").build();
         String pdfContent = "yvDquEQNiEAAAAABJRU5ErkJggg==";
-        try {
-            expectedOffer = InternshipOffer.builder().id(1L).allowedStudents(new ArrayList<>())
-                    .creationDate(new SimpleDateFormat("dd/MM/yyyy").parse("08/08/2020"))
-                    .description("description").employer(employer).file(pdfContent)
-                    .limitDateToApply(new SimpleDateFormat("dd/MM/yyyy").parse("31/08/2020"))
-                    .internshipStartDate(new SimpleDateFormat("dd/MM/yyyy").parse("01/11/2020"))
-                    .internshipStartDate(new SimpleDateFormat("dd/MM/yyyy").parse("01/04/2021"))
-                    .salary(20)
-                    .title("Title")
-                    .reviewState(ReviewState.PENDING)
-                    .startTime(8)
-                    .endTime(16)
-                    .build();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            expectedOffer2 = InternshipOffer.builder().id(2).allowedStudents(new ArrayList<>())
-                    .creationDate(new SimpleDateFormat("dd/MM/yyyy").parse("08/08/2020"))
-                    .description("description").employer(new Employer()).file(pdfContent)
-                    .limitDateToApply(new SimpleDateFormat("dd/MM/yyyy").parse("31/08/2020"))
-                    .internshipStartDate(new SimpleDateFormat("dd/MM/yyyy").parse("01/01/2021"))
-                    .internshipStartDate(new SimpleDateFormat("dd/MM/yyyy").parse("01/05/2021"))
-                    .salary(20)
-                    .title("Title")
-                    .reviewState(ReviewState.PENDING)
-                    .startTime(8)
-                    .endTime(16)
-                    .build();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        expectedOffer = InternshipOffer.builder()
+                .id(1L)
+                .title("Title")
+                .allowedStudents(new ArrayList<>())
+                .details(InternshipOfferDetails.builder()
+                        .description("description")
+                        .creationDate(LocalDate.parse("2020-08-08"))
+                        .limitDateToApply(LocalDate.parse("2020-08-31"))
+                        .internshipStartDate(LocalDate.parse("2020-11-01"))
+                        .internshipEndDate(LocalDate.parse("2021-04-01"))
+                        .startTime(LocalTime.of(8, 30))
+                        .endTime(LocalTime.of(16, 0))
+                        .salary(20)
+                        .build())
+                .employer(employer)
+                .file(pdfContent)
+                .reviewState(ReviewState.PENDING)
+                .build();
 
-        expectedOffers = new ArrayList<>();
-        expectedOffers.add(expectedOffer);
-        expectedOffers.add(expectedOffer2);
-
-        expectedOffersOfEmployer = new ArrayList<>();
-        expectedOffersOfEmployer.add(expectedOffer);
+        expectedOffer2 = InternshipOffer.builder()
+                .id(1L)
+                .title("Title")
+                .allowedStudents(new ArrayList<>())
+                .details(InternshipOfferDetails.builder()
+                        .description("description")
+                        .creationDate(LocalDate.parse("2020-08-08"))
+                        .limitDateToApply(LocalDate.parse("2020-08-31"))
+                        .internshipStartDate(LocalDate.parse("2020-11-01"))
+                        .internshipEndDate(LocalDate.parse("2021-05-01"))
+                        .startTime(LocalTime.of(8, 30))
+                        .endTime(LocalTime.of(16, 0))
+                        .salary(20)
+                        .build())
+                .employer(employer)
+                .file(pdfContent)
+                .reviewState(ReviewState.PENDING)
+                .build();
 
         expectedEmployer = Employer.builder()
-                .username("employeur")
-                .role("employer")
+                .email("employeur@gmail.com")
                 .offers(new ArrayList<>())
                 .build();
 
         expectedStudent = Student.builder()
                 .id(1L)
-                .username("student")
                 .password("password")
-                .role("student")
                 .firstName("Simon")
                 .lastName("Longpré")
                 .studentId("1386195")
-                .email("simon@cal.qc.ca")
+                .email("student@cal.qc.ca")
                 .phoneNumber("5144816959")
                 .address("6600 St-Jacques Ouest")
                 .build();
@@ -115,7 +112,7 @@ class InternshipOfferServiceTests {
         when(authenticationService.getCurrentUser()).thenReturn(expectedEmployer);
         when(offerRepository.saveAndFlush(expectedOffer)).thenReturn(expectedOffer);
         expectedOffer.setEmployer(null);
-        Optional<InternshipOffer> createdOffer = service.uploadInternshipOffer(expectedOffer);
+        Optional<InternshipOffer> createdOffer = service.createInternshipOffer(expectedOffer);
         assertThat(createdOffer).contains(expectedOffer);
     }
 
@@ -123,14 +120,14 @@ class InternshipOfferServiceTests {
     void tryToUploadOfferForNonexistentUser() {
         when(authenticationService.getCurrentUser()).thenReturn(null);
 
-        Optional<InternshipOffer> createdOffer = service.uploadInternshipOffer(expectedOffer);
+        Optional<InternshipOffer> createdOffer = service.createInternshipOffer(expectedOffer);
 
         assertThat(createdOffer).isEmpty();
     }
 
     @Test
     void getAllInternshipOffersReturnsListOffer() {
-        when(offerRepository.findAll()).thenReturn(expectedOffers);
+        when(offerRepository.findAll()).thenReturn(Arrays.asList(expectedOffer, expectedOffer2));
 
         List<InternshipOffer> createdOffers = service.getAllInternshipOffers();
 
@@ -140,7 +137,8 @@ class InternshipOfferServiceTests {
 
     @Test
     void getAllInternshipOffersByStudentID() {
-        when(offerRepository.findAllByAllowedStudentsId(expectedStudent.getId())).thenReturn(expectedOffers);
+        when(offerRepository.findAllByAllowedStudentsId(expectedStudent.getId()))
+                .thenReturn(Arrays.asList(expectedOffer, expectedOffer2));
 
         List<InternshipOffer> createdOffers = service.getOfferByAllowedStudentId(expectedStudent.getId());
 
@@ -150,7 +148,7 @@ class InternshipOfferServiceTests {
 
     @Test
     void getAllInternshipOffersWithPendingApproval() {
-        when(offerRepository.findAllByReviewStatePending()).thenReturn(expectedOffers);
+        when(offerRepository.findAllByReviewStatePending()).thenReturn(Arrays.asList(expectedOffer, expectedOffer2));
 
         List<InternshipOffer> createdOffers = service.getInternshipOffersWithPendingApproval();
 
@@ -160,7 +158,7 @@ class InternshipOfferServiceTests {
 
     @Test
     void getAllApprovedInternshipOffers() {
-        when(offerRepository.findAllByReviewStateApproved()).thenReturn(expectedOffers);
+        when(offerRepository.findAllByReviewStateApproved()).thenReturn(Arrays.asList(expectedOffer, expectedOffer2));
 
         List<InternshipOffer> createdOffers = service.getApprovedInternshipOffers();
 
@@ -194,22 +192,26 @@ class InternshipOfferServiceTests {
 
     @Test
     void getInternshipOffersOfEmployer() {
-        when(offerRepository.findByEmployerUsername("a@gmail.com")).thenReturn(expectedOffersOfEmployer);
-        List<InternshipOffer> offers = service.getInternshipOffersOfEmployer("a@gmail.com");
-        assertThat(expectedOffersOfEmployer.size()).isEqualTo(offers.size());
-        assertThat(offers.get(0)).isEqualTo(expectedOffersOfEmployer.get(0));
+        when(offerRepository.findByEmployerEmail(expectedEmployer.getEmail()))
+                .thenReturn(Collections.singletonList(expectedOffer));
+
+        List<InternshipOffer> actual = service.getInternshipOffersOfEmployer(expectedEmployer.getEmail());
+
+        assertThat(actual).hasSize(1);
+        assertThat(actual).contains(expectedOffer);
     }
 
     @Test
     void updateOffer() {
         var initialId = expectedOffer.getId();
-        var alteredId = 100L;
+        final var alteredId = 100L;
         var alteredResume = expectedOffer.toBuilder().id(alteredId).build();
         when(offerRepository.findById(initialId)).thenReturn(Optional.ofNullable(expectedOffer));
         when(offerRepository.saveAndFlush(expectedOffer)).thenReturn(expectedOffer);
 
         var actual = service.updateInternshipOffer(initialId, alteredResume);
 
+        assertThat(actual).isNotEmpty();
         assertThat(actual).contains(expectedOffer);
         assertThat(actual.get().getSemester()).isEqualTo(expectedOffer.getSemester());
     }
@@ -222,13 +224,13 @@ class InternshipOfferServiceTests {
         when(studentRepo.findById(expectedStudent.getId())).thenReturn(Optional.of(expectedStudent));
         when(offerRepository.saveAndFlush(expectedOffer2)).thenReturn(expectedOffer2);
 
-        var actual = service.addOrRemoveStudentFromOffer(expectedOffer.getId(), expectedStudent.getId());
+        var actual = service.switchOfferVisibilityForStudent(expectedOffer.getId(), expectedStudent.getId());
 
         assertThat(actual).contains(expectedOffer2);
     }
 
     @Test
-    void removeStudentFromOffer() {
+    void deleteStudentFromOffer() {
         expectedOffer.getAllowedStudents().add(expectedStudent);
         expectedOffer2 = expectedOffer.toBuilder().build();
         expectedOffer2.setAllowedStudents(Collections.emptyList());
@@ -236,7 +238,7 @@ class InternshipOfferServiceTests {
         when(studentRepo.findById(expectedStudent.getId())).thenReturn(Optional.of(expectedStudent));
         when(offerRepository.saveAndFlush(expectedOffer2)).thenReturn(expectedOffer2);
 
-        var actual = service.addOrRemoveStudentFromOffer(expectedOffer.getId(), expectedStudent.getId());
+        var actual = service.switchOfferVisibilityForStudent(expectedOffer.getId(), expectedStudent.getId());
 
         assertThat(actual).contains(expectedOffer2);
     }
@@ -246,7 +248,7 @@ class InternshipOfferServiceTests {
         when(offerRepository.findById(expectedOffer.getId())).thenReturn(Optional.of(expectedOffer));
         when(studentRepo.findById(expectedStudent.getId())).thenReturn(Optional.empty());
 
-        var actual = service.addOrRemoveStudentFromOffer(expectedOffer.getId(), expectedStudent.getId());
+        var actual = service.switchOfferVisibilityForStudent(expectedOffer.getId(), expectedStudent.getId());
 
         assertThat(actual).isEmpty();
     }
@@ -255,7 +257,7 @@ class InternshipOfferServiceTests {
     void addStudentToInvalidOffer() {
         when(offerRepository.findById(expectedOffer.getId())).thenReturn(Optional.empty());
 
-        var actual = service.addOrRemoveStudentFromOffer(expectedOffer.getId(), expectedStudent.getId());
+        var actual = service.switchOfferVisibilityForStudent(expectedOffer.getId(), expectedStudent.getId());
 
         assertThat(actual).isEmpty();
     }

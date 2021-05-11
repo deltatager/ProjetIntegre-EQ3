@@ -1,62 +1,47 @@
-import React from "react";
-import {useDateParser} from "./Hooks";
+import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
 import * as PropTypes from "prop-types";
+import React from "react";
+import {useDateParser, useTimeFormatter} from "../../Services/Hooks";
 
 export default function OfferDetails(props) {
-    const parseDate = useDateParser();
+    const parseDate = useDateParser()
+    const parseTime = useTimeFormatter()
 
-    return (
-        <div>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {`Date de création de l'offre :  ${parseDate(props.offer.creationDate)}`}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {`Date limite d'application : ${parseDate(props.offer.limitDateToApply)} `}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {`Début du stage : ${parseDate(props.offer.internshipStartDate)} `}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {`Fin du stage : ${parseDate(props.offer.internshipEndDate)}`}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {"Salaire horaire : $ " + props.offer.salary}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {"Nombre de places disponibles :  " + props.offer.nbStudentToHire}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {"Description de l'offre : " + props.offer.description}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {"Heure de début : " + props.offer.startTime + ":00"}
-            </Typography>
-            <Typography color={"textSecondary"}
-                        variant={"body1"}
-                        display={"block"}>
-                {"Heure de fin : " + props.offer.endTime + ":00"}
-            </Typography>
-        </div>
-    );
+    return <div>
+        <Typography variant={"body1"}>
+            {"Description : " + props.offer.details.description}
+        </Typography>
+        <Divider style={{maxWidth: "30%"}}/>
+        <Typography variant={"body1"}
+                    display={"block"}>
+            {"Nombre de stagiaires : " + props.offer.details.nbStudentToHire}
+        </Typography>
+        <Typography variant={"body1"}
+                    display={"block"}>
+            {`Date limite d'application : ${parseDate(props.offer.details.limitDateToApply)}`}
+        </Typography>
+        <Typography variant={"body1"}
+                    display={"block"}>
+            {`Du ${parseDate(props.offer.details.internshipStartDate)} au ${parseDate(props.offer.details.internshipEndDate)}`}
+        </Typography>
+        <Typography variant={"body1"}
+                    display={"block"}>
+            {"Horaire : " + parseTime(props.offer.details.startTime) + " à " + parseTime(props.offer.details.endTime)}
+        </Typography>
+        <Typography variant={"body1"}
+                    display={"block"}>
+            {"Taux horaire : $ " + props.offer.details.salary}
+        </Typography>
+        <Divider style={{maxWidth: "30%"}}/>
+        <Typography variant={"body2"}
+                    color={"textSecondary"}
+                    display={"block"}>
+            {`Créée le : ${parseDate(props.offer.details.creationDate)}`}
+        </Typography>
+    </div>
 }
 
 OfferDetails.propTypes = {
     offer: PropTypes.any.isRequired,
-};
+}

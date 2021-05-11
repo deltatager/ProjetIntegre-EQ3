@@ -3,6 +3,7 @@ package com.power222.tuimspfcauppbj.service;
 import com.power222.tuimspfcauppbj.dao.EmployerRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Employer;
+import com.power222.tuimspfcauppbj.util.SemesterContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,24 +40,23 @@ public class EmployerServiceTests {
     void beforeEach() {
         expectedEmployer = Employer.builder()
                 .id(1L)
-                .username("employer")
                 .password("password")
-                .role("employer")
                 .companyName("Cal Inc.")
                 .contactName("Simon Longpré")
                 .phoneNumber("5144816959")
                 .address("6600 St-Jacques Ouest")
-                .email("simon@cal.qc.ca")
+                .email("employer@cal.qc.ca")
                 .offers(Collections.emptyList())
                 .build();
     }
 
     @Test
     void getAllEmployersTest() {
+        SemesterContext.setCurrent(SemesterContext.getPresentSemester());
         var s1 = Employer.builder().id(1L).build();
         var s2 = Employer.builder().id(2L).build();
         var s3 = Employer.builder().id(3L).build();
-        when(employerRepo.findAll()).thenReturn(Arrays.asList(s1, s2, s3));
+        when(employerRepo.findAllBySemesters(SemesterContext.getPresentSemester())).thenReturn(Arrays.asList(s1, s2, s3));
 
         var actual = svc.getAllEmployers();
 
@@ -65,7 +65,8 @@ public class EmployerServiceTests {
 
     @Test
     void getNoEmployersTest() {
-        when(employerRepo.findAll()).thenReturn(Collections.emptyList());
+        SemesterContext.setCurrent(SemesterContext.getPresentSemester());
+        when(employerRepo.findAllBySemesters(SemesterContext.getPresentSemester())).thenReturn(Collections.emptyList());
 
         var actual = svc.getAllEmployers();
 
@@ -93,7 +94,8 @@ public class EmployerServiceTests {
     @Test
     void createEmployer() {
         expectedEmployer.setPassword("encodedPassword");
-        var dto = expectedEmployer.toBuilder().role(null).password("password").build();
+        var dto = expectedEmployer;
+        dto.setPassword("password");
         when(employerRepo.saveAndFlush(expectedEmployer)).thenReturn(expectedEmployer);
         when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedPassword");
 
@@ -104,7 +106,7 @@ public class EmployerServiceTests {
 
     @Test
     void createEmployerWithExistingUsername() {
-        when(userRepo.existsByUsername(expectedEmployer.getUsername())).thenReturn(true);
+        when(userRepo.existsByEmail(expectedEmployer.getEmail())).thenReturn(true);
 
         var actual = svc.persistNewEmployer(expectedEmployer);
 
@@ -122,7 +124,8 @@ public class EmployerServiceTests {
     void updateEmployerWithModifiedId() {
         var initialId = expectedEmployer.getId();
         var alteredId = 5L;
-        var alteredIdEmployer = expectedEmployer.toBuilder().id(alteredId).build();
+        var alteredIdEmployer = expectedEmployer;
+        alteredIdEmployer.setId(alteredId);
         when(employerRepo.findById(initialId)).thenReturn(Optional.of(expectedEmployer));
         when(employerRepo.saveAndFlush(expectedEmployer)).thenReturn(expectedEmployer);
 

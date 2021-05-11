@@ -60,7 +60,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/api/auth/password").permitAll()
 
                 //Semesters
-                .antMatchers(HttpMethod.GET, "/api/semesters", "/api/semsters/present").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/semesters", "/api/semesters/present").permitAll()
+
+                .antMatchers("/api/admins", "/api/admins/**").hasRole("ADMIN")
 
                 //Dev
                 .antMatchers("/h2-console/*").permitAll()

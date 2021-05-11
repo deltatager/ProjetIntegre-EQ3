@@ -3,6 +3,7 @@ package com.power222.tuimspfcauppbj.service;
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Student;
+import com.power222.tuimspfcauppbj.util.SemesterContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ public class StudentService {
     }
 
     public List<Student> getAllStudents() {
-        return studentRepo.findAll();
+        return studentRepo.findAllBySemesters(SemesterContext.getCurrent());
     }
 
     public Optional<Student> getStudentById(long id) {
@@ -33,11 +34,10 @@ public class StudentService {
     }
 
     public Optional<Student> persistNewStudent(Student student) {
-        if (userRepo.existsByUsername(student.getUsername()))
+        if (userRepo.existsByEmail(student.getEmail()))
             return Optional.empty();
 
         student.setPassword(passwordEncoder.encode(student.getPassword()));
-        student.setRole("student");
         student.setResumes(Collections.emptyList());
         student.setApplications(Collections.emptyList());
         return Optional.of(studentRepo.saveAndFlush(student));

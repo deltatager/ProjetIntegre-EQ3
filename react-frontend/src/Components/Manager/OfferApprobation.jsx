@@ -1,28 +1,32 @@
-import React, {useEffect, useState} from 'react';
-import {Typography} from "@material-ui/core";
-import PdfSelectionViewer from "../Utils/PdfSelectionViewer";
-import TextboxModal from "../Utils/TextboxModal";
-import {useApi, useModal} from "../Utils/Hooks";
-import useStyles from "../Utils/useStyles";
+import { Divider, Typography } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import React, { useEffect, useState } from "react";
+import { useApi, useModal } from "../../Services/Hooks";
+import ApprovalButtons from "../Utils/ApprovalButtons";
+import TextboxModal from "../Utils/Modal/TextboxModal";
 import OfferDetails from "../Utils/OfferDetails";
+import PdfSelectionViewer from "../Utils/PDF/PdfSelectionViewer";
+import useStyles from "../Utils/Style/useStyles";
 
-export default function OfferApprobation() {
-    const classes = useStyles();
-    const api = useApi();
-    const [offers, setOffers] = useState([]);
-    const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
-    const [isReasonModalOpen, openReasonModal, closeReasonModal] = useModal();
+export default function OfferApprobation({count}) {
+    const classes = useStyles()
+    const api = useApi()
+    const [offers, setOffers] = useState([])
+    const [currentOfferIndex, setCurrentOfferIndex] = useState(0)
+    const [isReasonModalOpen, openReasonModal, closeReasonModal] = useModal()
 
     useEffect(() => {
         api.get("/offers/pending")
             .then(r => setOffers(r ? r.data : []))
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+    useEffect(() => count(offers.length))
+
     function sendDecision(index, reviewState, reason = "") {
-        const nextState = [...offers];
-        delete nextState[index].applications;
-        nextState[index].reviewState = reviewState;
-        nextState[index].reasonForRejection = reason;
+        const nextState = [...offers]
+        nextState[index].applications = undefined
+        nextState[index].reviewState = reviewState
+        nextState[index].reasonForRejection = reason
         return api.put("/offers/" + nextState[index].id, nextState[index])
             .then(() => {
                 nextState.splice(index, 1)
@@ -35,53 +39,45 @@ export default function OfferApprobation() {
             })
     }
 
-    return (
-        <div style={{height: "100%"}}>
-            <PdfSelectionViewer documents={offers.map(o => o.file)} title={"Offres de stage en attente d'approbation"}>
-                {(i, setCurrent) => (
-                    <div key={i}>
-                        <div className={classes.buttonDiv}>
-                            <button
-                                type={"button"}
-                                className={classes.linkButton}
-                                onClick={() => sendDecision(i, "APPROVED")}
-                                style={{marginRight: 5}}
-                            ><i className="fa fa-check-square" style={{color: "green"}}/></button>
-                            <button
-                                type={"button"}
-                                className={classes.linkButton}
-                                onClick={() => {
-                                    setCurrentOfferIndex(i)
-                                    openReasonModal()
-                                }}
-                            ><i className="fa fa-ban" style={{color: "red"}}/></button>
-                        </div>
-                        <button
-                            type={"button"}
-                            className={[classes.linkButton, i === currentOfferIndex ? classes.fileButton : null].join(' ')}
-                            autoFocus={i === 0}
-                            onClick={() => {
-                                setCurrent(i);
-                                setCurrentOfferIndex(i);
-                            }}>
-                            <Typography color={"textPrimary"} variant={"body1"} display={"inline"}>
-                                {" " + offers[i].title + " "}
-                            </Typography>
-                            <Typography color={"textSecondary"} variant={"body2"} display={"inline"}>
-                                {offers[i].employer.companyName} {offers[i].employer.contactName}
-                            </Typography>
-                        </button>
-                        {currentOfferIndex === i && <OfferDetails offer={offers[i]}/>}
-                        <hr/>
-                    </div>
-                )}
-            </PdfSelectionViewer>
-            <TextboxModal
-                isOpen={isReasonModalOpen}
-                hide={closeReasonModal}
-                title={"Justifiez le refus"}
-                onSubmit={async (values) => sendDecision(currentOfferIndex, "DENIED", values.message)}
-            />
-        </div>
-    )
+    return <div style={{height: "100%"}}>
+        <PdfSelectionViewer documents={offers.map(o => o.file)} title={"Offres de stage en attente"}>
+            {(i, setCurrent) =>
+                <div key={i}>
+                    <Button
+                        onClick={() => {
+                            setCurrent(i)
+                            setCurrentOfferIndex(i)
+                        }}
+                        variant={i === currentOfferIndex ? "contained" : "outlined"}
+                        color={"primary"}>
+                        <Typography variant={"body1"} display={"inline"}>
+                            {offers[i].title}&ensp;
+                        </Typography>
+                        <Typography variant={"body2"} display={"inline"}>
+                            {offers[i].employer.companyName} {offers[i].employer.contactName}
+                        </Typography>
+                    </Button>
+                    {currentOfferIndex === i && <>
+                        <OfferDetails offer={offers[i]}/>
+                        <ApprovalButtons
+                            onApprove={() => sendDecision(i, "APPROVED")}
+                            onDeny={() => {
+                                setCurrentOfferIndex(i)
+                                openReasonModal()
+                            }}
+                            approveLabel={"Approuver"}
+                            denyLabel={"Refuser"}
+                        />
+                    </>}
+                    <Divider className={classes.dividers}/>
+                </div>
+            }
+        </PdfSelectionViewer>
+        <TextboxModal
+            isOpen={isReasonModalOpen}
+            hide={closeReasonModal}
+            title={"Justifiez le refus"}
+            onSubmit={async values => sendDecision(currentOfferIndex, "DENIED", values.message)}
+        />
+    </div>
 }

@@ -1,7 +1,11 @@
 package com.power222.tuimspfcauppbj.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import com.power222.tuimspfcauppbj.util.SemesterAware;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Filter;
 
@@ -9,18 +13,16 @@ import javax.persistence.*;
 import java.util.List;
 
 @Data
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Entity
-public class Student extends User {
+public class Student extends User implements SemesterAware {
 
     private String firstName;
     private String lastName;
     private String studentId;
-    private String email;
     private String phoneNumber;
     private String address;
 
@@ -40,4 +42,9 @@ public class Student extends User {
     @JsonIgnoreProperties("student")
     @Filter(name = "semesterFilter", condition = "semester = :semester")
     private List<StudentApplication> applications;
+
+    @Override
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }

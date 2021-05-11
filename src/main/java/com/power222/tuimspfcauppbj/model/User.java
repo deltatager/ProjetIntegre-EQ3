@@ -9,23 +9,25 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 
 @Data
-@SuperBuilder(toBuilder = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public class User {
+public abstract class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
-    private String username;
+    private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private boolean passwordExpired;
-    private String role;
+    private boolean disabled;
+
+    public abstract String getFullName();
 }

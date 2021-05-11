@@ -1,7 +1,9 @@
 package com.power222.tuimspfcauppbj.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.power222.tuimspfcauppbj.util.ContractSignatureState;
 import lombok.*;
+import lombok.Builder.Default;
 
 import javax.persistence.*;
 
@@ -10,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "studentApplication")
 public class Contract extends SemesterDiscriminatedEntity {
 
     @Id
@@ -29,14 +31,24 @@ public class Contract extends SemesterDiscriminatedEntity {
     @Lob
     private String engagementStudent;
 
-    private String adminName;
-
     private float totalHoursPerWeek;
     private String reasonForRejection;
 
-    @Builder.Default
+    @Default
     private ContractSignatureState signatureState = ContractSignatureState.PENDING_FOR_ADMIN_REVIEW;
 
     @OneToOne
     private StudentApplication studentApplication;
+
+    @OneToOne(mappedBy = "contract")
+    @JsonIgnoreProperties("contract")
+    private InternEvaluation internEvaluation;
+
+    @ManyToOne
+    @JsonIgnoreProperties("contracts")
+    private Admin admin;
+
+    @OneToOne(mappedBy = "contract")
+    @JsonIgnoreProperties("contract")
+    private BusinessEvaluation businessEvaluation;
 }

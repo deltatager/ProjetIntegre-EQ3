@@ -1,6 +1,7 @@
 package com.power222.tuimspfcauppbj.service;
 
 import com.power222.tuimspfcauppbj.dao.UserRepository;
+import com.power222.tuimspfcauppbj.model.Admin;
 import com.power222.tuimspfcauppbj.model.User;
 import com.power222.tuimspfcauppbj.util.PasswordDTO;
 import com.power222.tuimspfcauppbj.util.PasswordUpdateStatus;
@@ -17,7 +18,7 @@ import javax.transaction.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("noBootstrappingTests")
-@SpringBootTest
+@SpringBootTest(properties = {"spring.rsocket.server.port=0"})
 @Transactional
 public class AuthenticationServiceTests {
 
@@ -36,9 +37,8 @@ public class AuthenticationServiceTests {
     void beforeEach() {
         userRepo.deleteAll();
         expectedUser = userRepo.saveAndFlush(
-                User.builder()
-                        .username("admin")
-                        .role("admin")
+                Admin.builder()
+                        .email("admin@cal.qc.ca")
                         .password(encoder.encode("password"))
                         .passwordExpired(true)
                         .build());
@@ -51,7 +51,7 @@ public class AuthenticationServiceTests {
     }
 
     @Test
-    @WithMockUser("admin")
+    @WithMockUser("admin@cal.qc.ca")
     void validUser() {
         User actual = authSvc.getCurrentUser();
 
@@ -63,7 +63,7 @@ public class AuthenticationServiceTests {
         var dto = PasswordDTO.builder()
                 .oldPassword("password")
                 .newPassword("motdepasse")
-                .username(expectedUser.getUsername())
+                .username(expectedUser.getEmail())
                 .build();
 
         var actual = authSvc.updateUserPassword(dto);
@@ -89,7 +89,7 @@ public class AuthenticationServiceTests {
         var dto = PasswordDTO.builder()
                 .oldPassword("password")
                 .newPassword("password")
-                .username(expectedUser.getUsername())
+                .username(expectedUser.getEmail())
                 .build();
 
         var actual = authSvc.updateUserPassword(dto);
@@ -102,7 +102,7 @@ public class AuthenticationServiceTests {
         var dto = PasswordDTO.builder()
                 .oldPassword("bad_pass")
                 .newPassword("motdepasse")
-                .username(expectedUser.getUsername())
+                .username(expectedUser.getEmail())
                 .build();
 
         var actual = authSvc.updateUserPassword(dto);

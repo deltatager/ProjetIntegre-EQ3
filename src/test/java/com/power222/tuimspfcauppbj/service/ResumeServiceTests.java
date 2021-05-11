@@ -26,6 +26,10 @@ class ResumeServiceTests {
     @Mock
     private AuthenticationService authSvc;
 
+    @Mock
+    @SuppressWarnings("unused") //Required dependency of ResumeService
+    private NotificationService notificationService;
+
     @InjectMocks
     private ResumeService resumeSvc;
 
@@ -36,13 +40,11 @@ class ResumeServiceTests {
     void setUp() {
         expectedStudent = Student.builder()
                 .id(1L)
-                .username("student")
                 .password("password")
-                .role("student")
                 .firstName("Simon")
                 .lastName("Longpré")
                 .studentId("1386195")
-                .email("simon@cal.qc.ca")
+                .email("student@cal.qc.ca")
                 .phoneNumber("5144816959")
                 .address("6600 St-Jacques Ouest")
                 .build();
@@ -57,9 +59,9 @@ class ResumeServiceTests {
 
     @Test
     void getAllResumes() {
-        var r1 = Resume.builder().id(1L).build();
-        var r2 = Resume.builder().id(2L).build();
-        var r3 = Resume.builder().id(3L).build();
+        var r1 = Resume.builder().id(1).build();
+        var r2 = Resume.builder().id(2).build();
+        var r3 = Resume.builder().id(3).build();
 
         when(resumeRepo.findAll()).thenReturn(Arrays.asList(r1, r2, r3));
 
@@ -70,9 +72,9 @@ class ResumeServiceTests {
 
     @Test
     void getAllResumesByOwnerId() {
-        var r1 = Resume.builder().id(1L).build();
-        var r2 = Resume.builder().id(2L).build();
-        var r3 = Resume.builder().id(3L).build();
+        var r1 = Resume.builder().id(1).build();
+        var r2 = Resume.builder().id(2).build();
+        var r3 = Resume.builder().id(3).build();
 
         when(resumeRepo.findAllByOwner_Id(expectedStudent.getId())).thenReturn(Arrays.asList(r1, r2, r3));
 
@@ -125,7 +127,7 @@ class ResumeServiceTests {
     @Test
     void updateResume() {
         var initialId = expectedResume.getId();
-        var alteredId = 123L;
+        final var alteredId = 123L;
         var alteredResume = expectedResume.toBuilder().id(alteredId).build();
         when(resumeRepo.findById(initialId)).thenReturn(Optional.of(expectedResume));
         when(resumeRepo.saveAndFlush(alteredResume)).thenReturn(expectedResume);

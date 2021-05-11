@@ -3,6 +3,7 @@ package com.power222.tuimspfcauppbj.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.power222.tuimspfcauppbj.util.StudentApplicationState;
 import lombok.*;
+import lombok.Builder.Default;
 
 import javax.persistence.*;
 
@@ -11,17 +12,17 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = {"interview"})
 public class StudentApplication extends SemesterDiscriminatedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Builder.Default
+    @Default
     private StudentApplicationState state = StudentApplicationState.APPLICATION_PENDING_FOR_EMPLOYER_INITIAL_REVIEW;
 
-    @Builder.Default
+    @Default
     private String reasonForRejection = "";
 
     @ManyToOne

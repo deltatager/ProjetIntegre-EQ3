@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -18,7 +19,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SuppressWarnings({"rawtypes", "unchecked"})
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = {"spring.rsocket.server.port=0"})
 class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPoweredByJavaApplicationTests {
 
     @Autowired
@@ -56,7 +58,7 @@ class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPow
 
     @Test
     void authenticatedPrivateHelloWorldTest() {
-        ResponseEntity<String> response = restTemplate.withBasicAuth("employeur", "password")
+        ResponseEntity<String> response = restTemplate.withBasicAuth("employeur@gmail.com", "password")
                 .exchange("/api/hello/private", HttpMethod.GET, new HttpEntity<Void>(headers), String.class);
 
         assertThat(response, is(notNullValue()));
@@ -79,7 +81,7 @@ class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPow
         headers.add("X-Semester", "a2020d2021");
 
         ResponseEntity<String> response = restTemplate
-                .withBasicAuth("admin", "password")
+                .withBasicAuth("admin@cal.qc.ca", "password")
                 .exchange("/api/students", HttpMethod.GET, new HttpEntity<Void>(headers), String.class);
 
         assertThat(response, is(notNullValue()));
@@ -93,14 +95,14 @@ class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPow
         headers.add("X-Semester", "a2020h2021");
 
         ResponseEntity<List> response = restTemplate
-                .withBasicAuth("admin", "password")
+                .withBasicAuth("admin@cal.qc.ca", "password")
                 .exchange("/api/offers", HttpMethod.GET, new HttpEntity<Void>(headers), List.class);
 
         List<LinkedHashMap> offers = response.getBody();
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
-        System.err.println(offers.get(0).keySet());
+        assertThat(offers, is(notNullValue()));
         assertThat(offers.get(0).get("semester"), is(equalTo("a2020h2021")));
     }
 
@@ -110,14 +112,14 @@ class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversityPlusPow
         headers.add("X-Semester", "a2021h2022");
 
         ResponseEntity<List> response = restTemplate
-                .withBasicAuth("admin", "password")
+                .withBasicAuth("admin@cal.qc.ca", "password")
                 .exchange("/api/offers", HttpMethod.GET, new HttpEntity<Void>(headers), List.class);
 
         List<LinkedHashMap> offers = response.getBody();
 
         assertThat(response, is(notNullValue()));
         assertThat(response.getStatusCode(), is(equalTo(HttpStatus.OK)));
-        System.err.println(offers.get(0).keySet());
+        assertThat(offers, is(notNullValue()));
         assertThat(offers.get(0).get("semester"), is(equalTo("a2021h2022")));
     }
 }

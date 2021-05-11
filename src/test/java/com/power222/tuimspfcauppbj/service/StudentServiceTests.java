@@ -3,6 +3,7 @@ package com.power222.tuimspfcauppbj.service;
 import com.power222.tuimspfcauppbj.dao.StudentRepository;
 import com.power222.tuimspfcauppbj.dao.UserRepository;
 import com.power222.tuimspfcauppbj.model.Student;
+import com.power222.tuimspfcauppbj.util.SemesterContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,13 +40,11 @@ public class StudentServiceTests {
     void beforeEach() {
         expectedStudent = Student.builder()
                 .id(1L)
-                .username("student")
                 .password("password")
-                .role("student")
                 .firstName("Simon")
                 .lastName("Longpré")
                 .studentId("1386195")
-                .email("simon@cal.qc.ca")
+                .email("student@cal.qc.ca")
                 .phoneNumber("5144816959")
                 .address("6600 St-Jacques Ouest")
                 .applications(Collections.emptyList())
@@ -55,10 +54,11 @@ public class StudentServiceTests {
 
     @Test
     void getAllStudentsTest() {
+        SemesterContext.setCurrent(SemesterContext.getPresentSemester());
         var s1 = Student.builder().id(1L).build();
         var s2 = Student.builder().id(2L).build();
         var s3 = Student.builder().id(3L).build();
-        when(studentRepo.findAll()).thenReturn(Arrays.asList(s1, s2, s3));
+        when(studentRepo.findAllBySemesters(SemesterContext.getPresentSemester())).thenReturn(Arrays.asList(s1, s2, s3));
 
         var actual = svc.getAllStudents();
 
@@ -67,7 +67,8 @@ public class StudentServiceTests {
 
     @Test
     void getNoStudentsTest() {
-        when(studentRepo.findAll()).thenReturn(Collections.emptyList());
+        SemesterContext.setCurrent(SemesterContext.getPresentSemester());
+        when(studentRepo.findAllBySemesters(SemesterContext.getPresentSemester())).thenReturn(Collections.emptyList());
 
         var actual = svc.getAllStudents();
 
@@ -95,7 +96,8 @@ public class StudentServiceTests {
     @Test
     void createStudent() {
         expectedStudent.setPassword("encodedPassword");
-        var dto = expectedStudent.toBuilder().role(null).password("password").build();
+        var dto = expectedStudent;
+        dto.setPassword("password");
         when(studentRepo.saveAndFlush(expectedStudent)).thenReturn(expectedStudent);
         when(passwordEncoder.encode(dto.getPassword())).thenReturn("encodedPassword");
 
@@ -106,7 +108,7 @@ public class StudentServiceTests {
 
     @Test
     void createStudentWithExistingUsername() {
-        when(userRepo.existsByUsername(expectedStudent.getUsername())).thenReturn(true);
+        when(userRepo.existsByEmail(expectedStudent.getEmail())).thenReturn(true);
 
         var actual = svc.persistNewStudent(expectedStudent);
 
@@ -123,12 +125,13 @@ public class StudentServiceTests {
     @Test
     void updateStudentWithModifiedId() {
         var idToPersistTo = expectedStudent.getId();
-        var idToBeOverwritten = 5L;
-        var studentWithIdToIgnore = expectedStudent.toBuilder().id(idToBeOverwritten).build();
+        final var idToOverwrite = 5L;
+        var modifiedStudent = expectedStudent;
+        modifiedStudent.setId(idToOverwrite);
         when(studentRepo.findById(idToPersistTo)).thenReturn(Optional.of(expectedStudent));
         when(studentRepo.saveAndFlush(expectedStudent)).thenReturn(expectedStudent);
 
-        var actual = svc.updateStudent(idToPersistTo, studentWithIdToIgnore);
+        var actual = svc.updateStudent(idToPersistTo, modifiedStudent);
 
         assertThat(actual).isEqualTo(expectedStudent);
     }
