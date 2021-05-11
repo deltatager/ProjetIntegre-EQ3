@@ -67,10 +67,11 @@ export default function StudentStatus() {
                         })
                     }}
                 >
-                    <i className="fa fa-trash" style={{color: "white"}}/>&ensp;
+                    <i className="fa fa-trash"/>&ensp;
                     Supprimer l'évaluation
                 </Button>
                 {isDeleting && evaluationDeleting === i && <CircularProgress size={18}/>}
+                <Divider className={classes.dividers}/>
             </div>) : <Typography align="center">Aucun élément à afficher</Typography>}
         </Grid>
         <Grid
