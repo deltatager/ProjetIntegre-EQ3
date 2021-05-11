@@ -3,7 +3,6 @@ package com.power222.tuimspfcauppbj.service;
 import com.power222.tuimspfcauppbj.dao.ContractRepository;
 import com.power222.tuimspfcauppbj.model.Contract;
 import com.power222.tuimspfcauppbj.model.StudentApplication;
-import com.power222.tuimspfcauppbj.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,15 +31,10 @@ public class ContractServiceTest {
     @InjectMocks
     private ContractService contractSvc;
 
-    private User expectedUser;
     private Contract expectedContract;
 
     @BeforeEach
     void setUp() {
-        expectedUser = User.builder()
-                .id(1L)
-                .role("admin")
-                .build();
 
         StudentApplication expectedStudentApplication = StudentApplication.builder()
                 .id(1L)
