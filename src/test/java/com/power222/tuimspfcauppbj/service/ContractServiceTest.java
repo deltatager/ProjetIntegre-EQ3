@@ -28,6 +28,9 @@ public class ContractServiceTest {
     @Mock
     private AuthenticationService authSvc;
 
+    @Mock
+    private NotificationService notifSvc;
+
     @InjectMocks
     private ContractService contractSvc;
 
@@ -133,6 +136,7 @@ public class ContractServiceTest {
     @Test
     void deleteContractByIdTest() {
         var idToDelete = expectedContract.getId();
+        when(contractRepo.findById(idToDelete)).thenReturn(Optional.of(expectedContract));
 
         contractSvc.deleteContractById(idToDelete);
 

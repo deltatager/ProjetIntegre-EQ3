@@ -14,6 +14,10 @@ public final class SemesterContext {
     }
 
     public static void setCurrent(String value) {
+        if (value == null) {
+            CURRENT_SEMESTER.remove();
+        }
+
         CURRENT_SEMESTER.set(value);
     }
 

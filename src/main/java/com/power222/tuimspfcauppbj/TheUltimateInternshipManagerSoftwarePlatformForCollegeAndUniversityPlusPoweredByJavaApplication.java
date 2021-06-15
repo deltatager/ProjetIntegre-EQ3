@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @SpringBootApplication(exclude = {ReactiveSecurityAutoConfiguration.class, ReactiveUserDetailsServiceAutoConfiguration.class})
 @Slf4j
@@ -57,7 +58,7 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
             List<String> firstNames = Arrays.asList("Andrei", "Ernesto", "Simon", "Song", "Ismail", "Fabory", "Mathieu", "François", "Félix");
             List<String> lastNames = Arrays.asList("Belkin", "Mejia Mendez", "Longpré-Landry", "Xin Yu", "Ghedamsi", "Bangoura", "D'Onofrio", "Lacoursière", "St-Gelais");
             List<String> companies = Arrays.asList("Desjardins", "Dacima", "Generix", "Banque Nationale", "IGA", "Ministère du Transport");
-            Random random = new Random();
+            var random = ThreadLocalRandom.current();
 
             for (int i = 0; i < 5; i++)
                 userRepo.saveAndFlush(Student.builder()
@@ -86,13 +87,12 @@ public class TheUltimateInternshipManagerSoftwarePlatformForCollegeAndUniversity
 
             phoneNumber.append((random.nextInt(2) == 0) ? "(514) " : "(438) ");
 
-            for (int i = 0; i < 3; i++)
-                phoneNumber.append(random.nextInt(10));
+            for (int i = 0; i < 7; i++) {
+                if (i == 3) phoneNumber.append("-");
 
-            phoneNumber.append("-");
-
-            for (int i = 0; i < 4; i++)
                 phoneNumber.append(random.nextInt(10));
+            }
+
 
             return phoneNumber.toString();
         }

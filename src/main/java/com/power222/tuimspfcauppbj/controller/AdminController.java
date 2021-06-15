@@ -30,16 +30,14 @@ public class AdminController {
                 .orElse(ResponseEntity.status(HttpStatus.CONFLICT).build());
     }
 
-    @PutMapping
-    @RequestMapping("/toggle/{adminId}")
+    @PutMapping("/toggle/{adminId}")
     public ResponseEntity<Void> disableAdmin(@PathVariable long adminId) {
         return svc.toggleDisabledAdmin(adminId)
                 .map(v -> ResponseEntity.ok().<Void>build())
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping
-    @RequestMapping("/password")
+    @PutMapping("/password")
     public ResponseEntity<Void> changePassword(@RequestBody PasswordDTO dto) {
         return svc.updateUserPassword(dto)
                 .map(v -> ResponseEntity.ok().<Void>build())

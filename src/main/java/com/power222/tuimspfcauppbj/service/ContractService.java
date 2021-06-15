@@ -55,6 +55,7 @@ public class ContractService {
         var contractOp = getContractById(id);
         if (contractOp.isEmpty())
             return;
+
         notifSvc.notifyContractDeletion(contractOp.get());
         contractRepo.deleteById(id);
     }
