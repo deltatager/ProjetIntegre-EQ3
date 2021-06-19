@@ -1,0 +1,32 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+                apiVersion: v1
+                kind: Pod
+                spec:
+                  containers:
+                  - name: maven
+                    image: maven:alpine
+                    command:
+                    - cat
+                    tty: true
+                  - name: maven
+                    image: docker:dind
+                    command:
+                    - cat
+                    tty: true
+                '''
+        }
+    }
+
+    stages {
+        stage('Build Docker images') {
+            steps {
+                dir('react-frontend') {
+                    sh "docker build . -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-latest"
+                }
+            }
+        }
+    }
+}
