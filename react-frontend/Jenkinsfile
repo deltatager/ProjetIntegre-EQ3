@@ -1,12 +1,8 @@
 pipeline {
     agent {
         kubernetes {
+            inheritFrom 'jenkins-slave'
             yaml '''
-                apiVersion: v1
-                kind: Pod
-                spec:
-                  nodeSelector:
-                    kubernetes.io/arch: amd64
                   containers:
                   - name: maven
                     image: maven:alpine
