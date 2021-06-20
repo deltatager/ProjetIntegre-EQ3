@@ -18,7 +18,7 @@ pipeline {
             steps {
                 container('docker') {
                     dir('react-frontend') {
-                        sh "docker info"
+                        sh "docker build . -t docker-snap.nexus.int.slongpre.com/test:dev"
                     }
                 }
             }
