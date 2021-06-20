@@ -9,9 +9,6 @@ pipeline {
                     image: docker:dind
                     securityContext:
                       privileged: true
-                    command:
-                    - cat
-                    tty: true
                 '''
         }
     }
