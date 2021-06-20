@@ -16,8 +16,10 @@ pipeline {
     stages {
         stage('Build Docker images') {
             steps {
-                dir('react-frontend') {
-                    sh "docker info"
+                container('docker') {
+                    dir('react-frontend') {
+                        sh "docker info"
+                    }
                 }
             }
         }
