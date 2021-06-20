@@ -7,6 +7,8 @@ pipeline {
                   containers:
                   - name: docker
                     image: docker:dind
+                    securityContext:
+                      privileged: true
                     command:
                     - cat
                     tty: true
