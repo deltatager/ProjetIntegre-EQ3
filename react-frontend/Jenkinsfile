@@ -13,6 +13,10 @@ pipeline {
         }
     }
 
+    options {
+        ansiColors('xterm')
+    }
+
     stages {
         stage('Build Docker images') {
             steps {
