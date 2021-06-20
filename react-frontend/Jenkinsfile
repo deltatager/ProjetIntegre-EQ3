@@ -22,9 +22,10 @@ pipeline {
             steps {
                 container('docker') {
                     dir('react-frontend') {
-                        sh "docker build . -t docker-snap.nexus.int.slongpre.com/test:dev"
-                        sh "docker build . -f Dockerfile.production -t docker-snap.nexus.int.slongpre.com/test:prod"
-                        sh "docker image push -a docker-snap.nexus.int.slongpre.com/test"
+                        sh 'pwd'
+//                        sh "docker build . -t docker-snap.nexus.int.slongpre.com/test:dev"
+//                        sh "docker build . -f Dockerfile.production -t docker-snap.nexus.int.slongpre.com/test:prod"
+//                        sh "docker image push -a docker-snap.nexus.int.slongpre.com/test"
                     }
                 }
             }
