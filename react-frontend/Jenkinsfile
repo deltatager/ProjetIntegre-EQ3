@@ -46,7 +46,7 @@ pipeline {
                 parallel (
                     dev: {
                         container('docker') {
-                            workdir('react-frontend') {
+                            dir('react-frontend') {
                                 // Build
                                 sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 ."
                                 sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7 ."
@@ -60,7 +60,7 @@ pipeline {
                     },
                     prod: {
                         container('docker') {
-                            workdir('react-frontend') {
+                            dir('react-frontend') {
                                 // Build
                                 sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 . -f Dockerfile.production"
                                 sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7 . -f Dockerfile.production"
