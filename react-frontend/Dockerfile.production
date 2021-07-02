@@ -2,7 +2,6 @@
 FROM node:15-alpine as build
 WORKDIR /home/node
 COPY . ./
-RUN npx browserslist@latest --update-db
 RUN npm ci
 RUN npm run build
 ENTRYPOINT ["npm", "start"]
