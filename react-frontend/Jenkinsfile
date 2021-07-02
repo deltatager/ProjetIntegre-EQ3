@@ -27,24 +27,28 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker image') {
+        stage('Setup') {
             steps {
                 container('jnlp') {
                     sh "curl https://nexus.int.slongpre.com/repository/dockerfiles/Jenkins-Agent -o Dockerfile"
                 }
                 container('docker') {
-                
-                        // Login to Nexus
-                        sh 'echo $NEXUS_CREDS_PSW | docker login -u $NEXUS_CREDS_USR --password-stdin docker-snap.nexus.int.slongpre.com'
-                        // Creating build nodes context
-                        sh "docker context create node-armv7 --docker host=tcp://pi4.int.slongpre.com:2376"
-                        sh "docker context create node-amd64 --docker host=tcp://docker.int.slongpre.com:2376"
-                        // Creating multi-node buildx instance
-                        sh "docker buildx create --use --name agent-build node-amd64"
-                        sh "docker buildx create --append --name agent-build node-armv7"
-                        
-                    parallel (
-                        dev: {
+                    // Login to Nexus
+                    sh 'echo $NEXUS_CREDS_PSW | docker login -u $NEXUS_CREDS_USR --password-stdin docker-snap.nexus.int.slongpre.com'
+                    // Creating build nodes context
+                    sh "docker context create node-armv7 --docker host=tcp://pi4.int.slongpre.com:2376"
+                    sh "docker context create node-amd64 --docker host=tcp://docker.int.slongpre.com:2376"
+                    // Creating multi-node buildx instance
+                    sh "docker buildx create --use --name agent-build node-amd64"
+                    sh "docker buildx create --append --name agent-build node-armv7"
+                }
+            }
+        }
+        stage('Build Docker images') {
+            steps {
+                parallel (
+                    dev: {
+                        container('docker') {
                             // Build
                             sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 ."
                             sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7 ."
@@ -53,8 +57,10 @@ pipeline {
                             sh 'docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
                             sh 'docker manifest create docker-snap.nexus.int.slongpre.com/eq3-frontend:dev docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7'
                             sh "docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:dev"
-                        },
-                        prod: {
+                        }
+                    },
+                    prod: {
+                        container('docker') {
                             // Build
                             sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 . -f Dockerfile.production"
                             sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7 . -f Dockerfile.production"
@@ -64,8 +70,8 @@ pipeline {
                             sh 'docker manifest create docker-snap.nexus.int.slongpre.com/eq3-frontend:latest docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7'
                             sh "docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:latest"
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     }
