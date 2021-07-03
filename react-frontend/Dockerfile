@@ -4,6 +4,6 @@ WORKDIR /home/node
 
 COPY . ./
 
-RUN npm install
+RUN NODE_OPTIONS=--max_old_space_size=250; npm install
 
 ENTRYPOINT ["npm", "start"]
