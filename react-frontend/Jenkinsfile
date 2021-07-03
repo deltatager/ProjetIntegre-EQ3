@@ -43,8 +43,8 @@ pipeline {
         }
         stage('Build Docker images') {
             steps {
-                parallel (
-                    dev: {
+//                parallel (
+//                    dev: {
                         container('docker') {
                             dir('react-frontend') {
                                 // Build
@@ -55,12 +55,12 @@ pipeline {
                                 sh 'docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
                                 sh 'docker manifest create docker-snap.nexus.int.slongpre.com/eq3-frontend:dev docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7'
                                 sh "docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:dev"
-                            }
-                        }
-                    },
-                    prod: {
-                        container('docker') {
-                            dir('react-frontend') {
+//                            }
+//                        }
+//                    },
+//                    prod: {
+//                        container('docker') {
+//                            dir('react-frontend') {
                                 // Build
                                 sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 . -f Dockerfile.production"
                                 sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7 . -f Dockerfile.production"
@@ -71,8 +71,8 @@ pipeline {
                                 sh "docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:latest"
                             }
                         }
-                    }
-                )
+//                    }
+//                )
             }
         }
     }
