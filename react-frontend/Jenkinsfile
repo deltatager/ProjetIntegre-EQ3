@@ -7,8 +7,6 @@ pipeline {
                   containers:
                   - name: docker
                     image: docker.nexus.int.slongpre.com/dind-buildx:latest
-                    securityContext:
-                      privileged: true
                     env:
                     - name: DOCKER_CLI_EXPERIMENTAL
                       value: enabled
