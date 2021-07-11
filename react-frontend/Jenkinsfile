@@ -43,7 +43,7 @@ pipeline {
                                 sh "docker buildx build --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:dev-amd64 ."
                                 sh "docker buildx build --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:dev-arm64 ."
                                 // Multi-arch manifest
-                                sh 'docker manifest create docker.int.slongpre.com/jeq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
                                 sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
                                 sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
                                 sh "docker manifest push docker.int.slongpre.com/eq3-frontend:dev"
