@@ -40,7 +40,9 @@ pipeline {
                             container('docker') {
                                 dir('react-frontend') {
                                     sh "docker buildx build --target dev --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:dev-arm64 ."
-                                    sh "docker buildx build --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:arm64 ."
+                                    if (env.BRANCH_NAME == 'master') {
+                                        sh "docker buildx build --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:arm64 ."
+                                    }
 
                                 }
                             }
@@ -49,7 +51,9 @@ pipeline {
                             container('docker') {
                                 dir('react-frontend') {
                                     sh "docker buildx build --target dev --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:dev-amd64 ."
-                                    sh "docker buildx build --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:amd64 ."
+                                    if (env.BRANCH_NAME == 'master') {
+                                        sh "docker buildx build --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:amd64 ."
+                                    }
                                 }
                             }
                         }
@@ -69,12 +73,14 @@ pipeline {
                             }
                         },
                         prod: {
-                            container('docker') {
-                                // Multi-arch manifest prod
-                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
-                                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
-                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
-                                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
+                            if (env.BRANCH_NAME == 'master') {
+                                container('docker') {
+                                    // Multi-arch manifest prod
+                                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                                    sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
+                                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                                    sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
+                                }
                             }
                         }
                 )
