@@ -58,16 +58,18 @@ pipeline {
         }
         stage('Create and publish multi-arch manifests') {
             steps {
-                // Multi-arch manifest dev
-                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
-                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
-                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
-                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:dev"
-                // Multi-arch manifest prod
-                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
-                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
-                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
-                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
+                container('docker') {
+                    // Multi-arch manifest dev
+                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                    sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
+                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                    sh "docker manifest push docker.int.slongpre.com/eq3-frontend:dev"
+                    // Multi-arch manifest prod
+                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                    sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
+                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                    sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
+                }
             }
         }
     }
