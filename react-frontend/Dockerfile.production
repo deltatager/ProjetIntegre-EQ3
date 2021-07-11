@@ -2,6 +2,7 @@
 FROM node:15-alpine as build
 WORKDIR /home/node
 COPY . ./
+RUN npm -g install react-scripts
 RUN NODE_OPTIONS=--max_old_space_size=1000; npm ci
 RUN npm run build
 ENTRYPOINT ["npm", "start"]
