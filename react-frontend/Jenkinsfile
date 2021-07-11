@@ -35,41 +35,49 @@ pipeline {
         }
         stage('Build Docker images') {
             steps {
-                parallel (
-                    arm64: {
-                        container('docker') {
-                            dir('react-frontend') {
-                                sh "docker buildx build --target dev --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:dev-arm64 ."
-                                sh "docker buildx build --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:arm64 ."
+                parallel(
+                        arm64: {
+                            container('docker') {
+                                dir('react-frontend') {
+                                    sh "docker buildx build --target dev --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:dev-arm64 ."
+                                    sh "docker buildx build --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:arm64 ."
 
+                                }
+                            }
+                        },
+                        amd64: {
+                            container('docker') {
+                                dir('react-frontend') {
+                                    sh "docker buildx build --target dev --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:dev-amd64 ."
+                                    sh "docker buildx build --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:amd64 ."
+                                }
                             }
                         }
-                    },
-                    amd64: {
-                        container('docker') {
-                            dir('react-frontend') {
-                                sh "docker buildx build --target dev --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:dev-amd64 ."
-                                sh "docker buildx build --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:amd64 ."
-                            }
-                        }
-                    }
                 )
             }
         }
         stage('Create and publish multi-arch manifests') {
             steps {
-                container('docker') {
-                    // Multi-arch manifest dev
-                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
-                    sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
-                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
-                    sh "docker manifest push docker.int.slongpre.com/eq3-frontend:dev"
-                    // Multi-arch manifest prod
-                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
-                    sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
-                    sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
-                    sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
-                }
+                parallel(
+                        dev: {
+                            container('docker') {
+                                // Multi-arch manifest dev
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:dev"
+                            }
+                        },
+                        prod: {
+                            container('docker') {
+                                // Multi-arch manifest prod
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
+                            }
+                        }
+                )
             }
         }
     }
