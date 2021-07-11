@@ -6,7 +6,7 @@ pipeline {
                 spec:
                   containers:
                   - name: docker
-                    image: docker.nexus.int.slongpre.com/dind-buildx:latest
+                    image: docker.int.slongpre.com/dind-buildx:latest
                     env:
                     - name: DOCKER_CLI_EXPERIMENTAL
                       value: enabled
@@ -14,10 +14,6 @@ pipeline {
                     args: ["999999999"]
                 '''
         }
-    }
-    
-    environment {
-        NEXUS_CREDS = credentials('95cd6da5-0ee6-4d02-8e35-e80f302ff4cb')
     }
 
     options {
@@ -28,14 +24,12 @@ pipeline {
         stage('Setup') {
             steps {
                 container('docker') {
-                    // Login to Nexus
-                    sh 'echo $NEXUS_CREDS_PSW | docker login -u $NEXUS_CREDS_USR --password-stdin docker-snap.nexus.int.slongpre.com'
                     // Creating build nodes context
-                    sh "docker context create node-armv7 --docker host=tcp://pi4.int.slongpre.com:2376"
+                    sh "docker context create node-arm64 --docker host=tcp://pi4.int.slongpre.com:2376"
                     sh "docker context create node-amd64 --docker host=tcp://docker.int.slongpre.com:2376"
                     // Creating multi-node buildx instance
                     sh "docker buildx create --use --name agent-build node-amd64"
-                    sh "docker buildx create --append --name agent-build node-armv7"
+                    sh "docker buildx create --append --name agent-build node-arm64"
                 }
             }
         }
@@ -47,12 +41,12 @@ pipeline {
                             dir('react-frontend') {
                                 // Build
                                 sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 ."
-                                sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7 ."
+                                sh "docker buildx build --push --platform linux/arm64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-arm64 ."
                                 // Multi-arch manifest
-                                sh 'docker manifest create docker-snap.nexus.int.slongpre.com/jeq3-frontend:dev-$(date +%Y%m%d) docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7'
-                                sh 'docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
-                                sh 'docker manifest create docker-snap.nexus.int.slongpre.com/eq3-frontend:dev docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:dev-armv7'
-                                sh "docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:dev"
+                                sh 'docker manifest create docker.int.slongpre.com/jeq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
+                                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:dev"
 //                            }
 //                        }
 //                    },
@@ -60,13 +54,13 @@ pipeline {
 //                        container('docker') {
 //                            dir('react-frontend') {
                                 // Build
-                                sh "docker buildx build --push --platform linux/amd64 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 . -f Dockerfile.production"
-                                sh "docker buildx build --push --platform linux/arm/v7 -t docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7 . -f Dockerfile.production"
+                                sh "docker buildx build --push --platform linux/amd64 -t docker.int.slongpre.com/eq3-frontend:amd64 . -f Dockerfile.production"
+                                sh "docker buildx build --push --platform linux/arm64 -t docker.int.slongpre.com/eq3-frontend:arm64 . -f Dockerfile.production"
                                 // Multi-arch manifest
-                                sh 'docker manifest create docker-snap.nexus.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7'
-                                sh 'docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
-                                sh 'docker manifest create docker-snap.nexus.int.slongpre.com/eq3-frontend:latest docker-snap.nexus.int.slongpre.com/eq3-frontend:amd64 docker-snap.nexus.int.slongpre.com/eq3-frontend:armv7'
-                                sh "docker manifest push docker-snap.nexus.int.slongpre.com/eq3-frontend:latest"
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                                sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:$(date +%Y%m%d)'
+                                sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:latest docker.int.slongpre.com/eq3-frontend:amd64 docker.int.slongpre.com/eq3-frontend:arm64'
+                                sh "docker manifest push docker.int.slongpre.com/eq3-frontend:latest"
                             }
                         }
 //                    }
