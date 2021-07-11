@@ -1,7 +1,7 @@
 import DateFnsUtils from "@date-io/date-fns"
 import CssBaseline from "@material-ui/core/CssBaseline"
 import * as locales from "@material-ui/core/locale"
-import createMuiTheme from "@material-ui/core/styles/createMuiTheme"
+import {createTheme} from "@material-ui/core/styles";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers"
 import ThemeProvider from "@material-ui/styles/ThemeProvider"
 import axios from "axios"
@@ -54,7 +54,7 @@ function App() {
             .then(r => setSemester(r ? r.data : ""))
     }, [])
 
-    return <ThemeProvider theme={createMuiTheme(themeOptions, locales["frFR"])}>
+    return <ThemeProvider theme={createTheme(themeOptions, locales["frFR"])}>
         <MuiPickersUtilsProvider utils={DateFnsUtils} locale={frCA}>
             <ModalContext.Provider value={{open: openErrorModal}}>
                 <SemesterContext.Provider value={{semester, setSemester}}>
