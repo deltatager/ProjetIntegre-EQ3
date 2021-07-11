@@ -54,6 +54,10 @@ pipeline {
                         }
                     }
                 )
+            }
+        }
+        stage('Create and publish multi-arch manifests') {
+            steps {
                 // Multi-arch manifest dev
                 sh 'docker manifest create docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d) docker.int.slongpre.com/eq3-frontend:dev-amd64 docker.int.slongpre.com/eq3-frontend:dev-arm64'
                 sh 'docker manifest push docker.int.slongpre.com/eq3-frontend:dev-$(date +%Y%m%d)'
