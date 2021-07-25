@@ -6,7 +6,7 @@ pipeline {
                 spec:
                   containers:
                   - name: docker
-                    image: docker.int.slongpre.com/dind-buildx:latest
+                    image: docker.int.slongpre.com/buildx-cli:latest
                     env:
                     - name: DOCKER_CLI_EXPERIMENTAL
                       value: enabled
@@ -26,7 +26,7 @@ pipeline {
                 container('docker') {
                     // Creating build nodes context
                     sh "docker context create node-arm64 --docker host=tcp://pi4.int.slongpre.com:2376"
-                    sh "docker context create node-amd64 --docker host=tcp://docker.int.slongpre.com:2376"
+                    sh "docker context create node-amd64 --docker host=tcp://kube.int.slongpre.com:2376"
                     // Creating multi-node buildx instance
                     sh "docker buildx create --use --name agent-build node-amd64"
                     sh "docker buildx create --append --name agent-build node-arm64"
